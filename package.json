@@ -13,8 +13,13 @@
     "bootstrap": "^5.3.3",
     "bootstrap-icons": "^1.11.3",
     "sass": "^1.80.2",
+<<<<<<< HEAD
     "view-router": "^0.2.3",
     "vue": "^3.5.10"
+=======
+    "vue": "^3.5.10",
+    "vue-router": "^4.4.5"
+>>>>>>> 3efc5af52e451e1bb85d44f1b5d6b9ccc02032d2
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.1.4",
