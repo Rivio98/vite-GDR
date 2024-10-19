@@ -19,4 +19,13 @@ export default {
 
 <style lang="scss">
 @use './styles/generals.scss';
+
+main {
+  height: calc(100vh - 60px);
+}
+
+section {
+  height: 100%;
+  overflow: auto;
+}
 </style>

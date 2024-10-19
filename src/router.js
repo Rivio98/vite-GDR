@@ -1,8 +1,9 @@
 import { createRouter, createWebHistory } from "vue-router";
 import PageHome from "./pages/PageHome.vue";
 import PageCharacters from "./pages/PageCharacters.vue";
+import PageNotFound from "./pages/PageNotFound.vue";
+import PageShowCharacter from "./pages/PageShowCharacter.vue";
 
-// import AppPageNotFound from "./pages/AppPageNotFound.vue";
 
 const router = createRouter({
     history: createWebHistory(),
@@ -17,16 +18,21 @@ const router = createRouter({
             name: 'characters',
             component: PageCharacters
         },
+        {
+            path: '/character/:slug',
+            name: 'character',
+            component: PageShowCharacter
+        },
         // {
         //     path: '/contacts',
         //     name: 'contact',
         //     component: AppContact
         // },
-        // {
-        //     path: '/:pathMatch(.*)*',
-        //     name: 'not-found',
-        //     component: AppPageNotFound
-        // },
+        {
+            path: '/:pathMatch(.*)*',
+            name: 'not-found',
+            component: PageNotFound
+        },
     ]
 });
 
