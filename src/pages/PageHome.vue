@@ -6,14 +6,16 @@ export default {
 </script>
 <template>
     <div class="container">
-        <div id="home">
-            <div class="row">
-                <div class="col-12">
-                    <h1 class="text-center">Pixel GDR World</h1>
-                    <p class="text-center">Immergiti nel nostro fantastico mondo in pixel art</p>
-                    <div class="text-center">
-                        <router-link :to="{ name: 'characters' }" class="btn-start">Inizia
-                        </router-link>
+        <div class="row">
+            <div class="col-12">
+                <div class="content text-center" id="home">
+                    <div>
+                        <h1>Pixel GDR World</h1>
+                        <p>Immergiti nel nostro fantastico mondo in pixel art</p>
+                        <div>
+                            <router-link :to="{ name: 'characters' }" class="btn-start">Inizia
+                            </router-link>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -22,16 +24,21 @@ export default {
 </template>
 
 <style lang="scss" scoped>
+@use '../styles/variables/colorText' as *;
+
 #home {
-    text-align: center;
     color: #ffffff;
-    display: flex;
-    justify-content: center;
-    align-items: center;
     height: calc(100vh - 60px);
     background-image: url('../assets/PixelArtBackground.gif');
     background-size: cover;
+    display: flex;
+    justify-content: center;
 
+    align-items: center;
+
+    h1 {
+        color: $color_text;
+    }
 
     .btn-start {
         display: inline-block;

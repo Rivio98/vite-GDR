@@ -1,17 +1,18 @@
 <script>
-import Header from './components/Header.vue'
+import HeaderComp from './components/HeaderComp.vue'
 import PageHome from './pages/PageHome.vue';
 
 export default {
   components: {
-    Header,
+    HeaderComp,
     PageHome,
   },
 }
 </script>
 
 <template>
-  <Header />
+
+  <HeaderComp />
   <main>
     <router-view></router-view>
   </main>

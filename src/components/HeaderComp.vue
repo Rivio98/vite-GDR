@@ -1,16 +1,15 @@
 <script>
 import { store } from '../store.js';
 export default {
-  name: 'Header',
+  name: 'HeaderComp',
   data() {
     return {
       store,
     }
   },
   methods: {
-    // Metodo per verificare se la rotta corrente è attiva
     isActiveRoute(routeName) {
-      return this.$route.name === routeName;  // Confronta il nome della rotta corrente
+      return this.$route.name === routeName;
     }
   }
 }
@@ -19,9 +18,9 @@ export default {
 
 <template>
   <header>
-    <nav class="navbar navbar-expand-lg bg-dark p-0">
+    <nav class="navbar h-100 navbar-expand-lg bg-dark px-5 py-0">
       <div class="container-fluid">
-        <router-link :to="{ name: 'homepage' }" class="navbar-brand text-white" href="#">GDR</router-link>
+        <router-link :to="{ name: 'homepage' }" class="navbar-brand text-white m-cust" href="#">GDR</router-link>
         <button class="navbar-toggler border-white" type="button" data-bs-toggle="collapse"
           data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false"
           aria-label="Toggle navigation">
@@ -30,7 +29,7 @@ export default {
         <div class="collapse navbar-collapse justify-content-end" id="navbarNavAltMarkup">
           <ul class="navbar-nav">
             <li v-for="item, in store.zuccherinos">
-              <router-link class="nav-link text-white" :class="{ active: isActiveRoute(item.name) }" aria-current="page"
+              <router-link class="nav-link col-link" :class="{ active: isActiveRoute(item.name) }" aria-current="page"
                 :to="{ name: item.name }"> {{
                   item.label
                 }}
@@ -50,6 +49,12 @@ header {
   height: 60px;
 }
 
+
+.col-link {
+  color: $color_link;
+}
+
+
 .navbar li {
   margin: 0px 10px;
 }
@@ -57,15 +62,24 @@ header {
 .nav-link {
   border-top: 3px solid #212529;
   text-align: center;
+
+  &:hover {
+    color: $color_text
+  }
 }
 
-.active {
-  color: $color_text;
+.nav-link.col-link.active {
+  color: white;
   border-bottom: 3px solid $color_text;
 
 }
 
-.nav-link:hover {
-  color: $color_text;
+h4 {
+  font-size: 16px;
+}
+
+
+.m-cust {
+  margin: 4px 0px 0px 0px;
 }
 </style>

@@ -25,11 +25,10 @@ export default {
 <template>
     <section>
         <div class="container mt-3 mb-2">
-
             <div class="row">
                 <div class="col-6">
                     <router-link :to="{ name: 'characters' }" class="text-decoration-none">
-                        <div class="d-flex align-items-center color">
+                        <div class="d-flex align-items-baseline color">
                             <i class="fa-solid fa-rotate-left fa-2xl"></i>
                             <h3 class="ms-3">Back</h3>
                         </div>
@@ -38,28 +37,26 @@ export default {
             </div>
 
 
-            <div class="container card character-card b-grey bg-dark text-light p-4 rounded-5 h-100">
+            <div class="container card character-card text-bg-dark py-3 px-0 rounded-5">
                 <div class="row">
                     <div class="col-12">
                         <div class="content text-center">
                             <h1 :class="`text-${character.type.name.toLowerCase()}`">{{ character.name }}</h1>
                             <div class="row">
-                                <div class="col-6">
-                                    <h2 :class="`text-${character.type.name.toLowerCase()}`">{{ character.type.name }}
-                                    </h2>
-                                </div>
-                                <div class="col-6">
+                                <div class="col-12">
                                     <div class="btn-group dropdown w-100">
-                                        <button class="btn btn-secondary btn-lg dropdown-toggle w-100" type="button"
+                                        <button class="btn btn-lg dropdown-toggle text-white " type="button"
                                             data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                            Description
+                                            <span :class="`text-${character.type.name.toLowerCase()}`">{{
+                                                character.type.name }}
+                                            </span> &nbsp;
                                         </button>
-                                        <div class="dropdown-menu w-100 m-0 p-1 bg-dark text-light text-center">
+                                        <div class="dropdown-menu w-100 m-0 p-1 text-bg-dark text-center">
                                             <div>
-                                                <h3 class="b-grey rounded-top-5 m-0 p-1">Class:</h3>
+                                                <h4 class="color_link rounded-top-5 m-0 p-1">Class:</h4>
                                             </div>
-                                            <div class="content text-center b-grey rounded-bottom-5">
-                                                <p class="overflow-auto" style="max-height: 250px;">
+                                            <div class="text-center rounded-bottom-5">
+                                                <p class="overflow-auto">
                                                     {{ character.type.description }}
                                                 </p>
                                             </div>
@@ -71,13 +68,15 @@ export default {
                     </div>
                 </div>
 
-                <div class="row mt-2">
-                    <div class="d-flex">
-                        <div class="col-3">
-                            <img :src="`${store.baseUrl}${character.type.image}`" class="img-fluid rounded"
+                <div class="row">
+                    <div class="col-6 col-md-3 order-0 offset-3 offset-md-0">
+                        <div class="content my-3">
+                            <img :src="`${store.baseUrl}${character.type.image}`" class="img-fluid "
                                 alt="Character Image">
                         </div>
-                        <div class="col-2 offset-1">
+                    </div>
+                    <div class="col-6 col-md-3 order-2 order-md-1">
+                        <div class="content m-3">
                             <h4>Weapons:</h4>
                             <div v-if="character.items.length > 0">
                                 <div class="d-flex justify-content-between py-2" v-for="item in character.items"
@@ -87,30 +86,33 @@ export default {
                                         id='item-img'>
                                 </div>
                             </div>
-                            <span v-else class="text-danger">- Il personaggio non ha armi -</span>
+                            <span v-else class="text-danger">Il personaggio non possiede armi</span>
                         </div>
-                        <div class="col-5 offset-1">
-                            <table class="table table-borderless text-light">
+                    </div>
+                    <div class="col-md-5 order-1">
+                        <div class="content m-3">
+                            <h4>Stats:</h4>
+                            <table class="table table-sm table-borderless table-dark">
                                 <tbody>
                                     <tr>
-                                        <th class="bg-dark text-light">Forza</th>
-                                        <td class="bg-dark text-light">{{ character.strength }}</td>
+                                        <th>Forza</th>
+                                        <td>{{ character.strength }}</td>
                                     </tr>
                                     <tr>
-                                        <th class="bg-dark text-light">Difesa</th>
-                                        <td class="bg-dark text-light">{{ character.defense }}</td>
+                                        <th>Difesa</th>
+                                        <td>{{ character.defense }}</td>
                                     </tr>
                                     <tr>
-                                        <th class="bg-dark text-light">Velocità</th>
-                                        <td class="bg-dark text-light">{{ character.speed }}</td>
+                                        <th>Velocità</th>
+                                        <td>{{ character.speed }}</td>
                                     </tr>
                                     <tr>
-                                        <th class="bg-dark text-light">Intelligenza</th>
-                                        <td class="bg-dark text-light">{{ character.intelligence }}</td>
+                                        <th>Intelligenza</th>
+                                        <td>{{ character.intelligence }}</td>
                                     </tr>
                                     <tr>
-                                        <th class="bg-dark text-light">Vita</th>
-                                        <td class="bg-dark text-light">{{ character.life }}</td>
+                                        <th>Vita</th>
+                                        <td>{{ character.life }}</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -118,29 +120,38 @@ export default {
                     </div>
                 </div>
 
-                <div class="row mt-4">
+                <div class="row">
                     <div class="col-12">
-                        <div class="content text-center">
+                        <div class="content text-center mx-3 my-2">
                             <p class="mb-4">{{ character.description }}</p>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-
     </section>
 
 </template>
 
 <style lang="scss" scoped>
 @use '../styles/variables/color_classes' as *;
+@use '../styles/variables/colorText' as *;
+
+
+.color {
+    color: $color_text;
+}
+
+.color_link {
+    color: $color_link;
+}
 
 .character-card {
     #character-img {
         width: 300px;
         height: 300px;
-        margin-left: 20px;
     }
+
 
     #item-img {
         width: 30px;
