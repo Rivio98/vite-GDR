@@ -74,6 +74,7 @@ export default {
     text-align: center;
     margin-top: 30px;
     }
+    
 
     .fight-arena {
     display: flex;
