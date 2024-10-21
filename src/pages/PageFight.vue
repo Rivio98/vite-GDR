@@ -9,7 +9,8 @@ export default {
             store,
             fightResult: null,
             isAttacking: false,           // Per controllare quando un attacco è in corso
-            currentAttacker: null,        // Per sapere chi sta attaccando
+            currentAttacker: null,
+            isMissing: false,            // Per sapere chi sta attaccando
         };
     },
 
@@ -124,9 +125,22 @@ export default {
         },
 
         attack(attacker, defender) {
-            const damage = (attacker.strength + attacker.intelligence) - defender.defense;
-            const actualDamage = damage > 0 ? damage : 1; // Assicurati che ci sia almeno 1 danno
-            defender.life -= actualDamage;
+            const probability_miss = Math.random();
+            const probability_crit = Math.random();
+            if (probability_miss < 0.2) {
+                this.isMissing = true;
+
+            }
+            else {
+                if (probability_crit < 0.2) {
+                    const crit_damage = Math.floor((attacker.strength + attacker.intelligence) * 1.5) - defender.defense;
+                    defender.life -= crit_damage;
+                }
+                else {
+                    const damage = (attacker.strength + attacker.intelligence) - defender.defense;
+                    defender.life -= damage;
+                }
+            }
 
             if (defender.life < 0) {
                 defender.life = 0; // La vita non può scendere sotto 0
@@ -165,24 +179,21 @@ export default {
                 <div class="life-fill-random position-absolute h-100 border-1"
                     :class="lifeBarClass(randomCharacter?.life)"
                     :style="{ width: `${(randomCharacter?.life / randomCharacter?.maxLife) * 100}%` }">
-                    {{ randomCharacter?.life }}</div>
+                    <span v-if="randomCharacter?.life != 0">{{ randomCharacter?.life }}</span>
+                </div>
             </div>
         </div>
         <div class="fight-page">
             <div class="fight-arena d-flex justify-content-center align-items-center">
                 <!-- Personaggio selezionato -->
                 <div v-if="selectedCharacter" class="character selected"
-                    :class="{ 'character-attack-left': isAttacking && currentAttacker === selectedCharacter }">
-                    <!-- <h2 :class="`text-${selectedCharacter?.type.name.toLowerCase()}`">{{ selectedCharacter?.name }}</h2> -->
-
+                    :class="{ 'character-attack-left': isAttacking && currentAttacker === selectedCharacter }, { 'dodging-left': isMissing }">
                     <img :src="`${store.baseUrl}${selectedCharacter?.type.image}`" alt="">
                 </div>
 
                 <!-- Personaggio casuale -->
                 <div v-if="randomCharacter" class="character"
-                    :class="{ 'character-attack-right': isAttacking && currentAttacker === randomCharacter }">
-                    <!-- <h2 :class="`text-${randomCharacter?.type.name.toLowerCase()}`">{{ randomCharacter?.name }}</h2> -->
-
+                    :class="{ 'character-attack-right': isAttacking && currentAttacker === randomCharacter }, { 'dodging-right': isMissing }">
                     <img :src="`${store.baseUrl}${randomCharacter?.type.image}`" alt="">
                 </div>
             </div>
@@ -233,6 +244,14 @@ export default {
 .character-attack-right {
     transform: translateX(-100px); // Muovi il personaggio casuale verso sinistra (attacco)
 }
+
+/*.dodging-left {
+    transform: translateX(-100px); // Muovi il personaggio selezionato verso sinistra (dodging)
+}
+
+.dodging-right {
+    transform: translateX(100px); // Muovi il personaggio casuale verso destra (dodging)
+}*/
 
 h1 {
     max-width: 800px;
