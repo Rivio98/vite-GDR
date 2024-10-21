@@ -72,7 +72,7 @@ export default {
 <template>
     <div class="fight-page">
         <div class="fight-arena">
-            <div class="character selected"> <!-- Applica la classe selected dinamicamente -->
+            <div v-if="selectedCharacter" class="character selected"> <!-- Applica la classe selected dinamicamente -->
                 <h2 :class="`text-${store.character?.type.name.toLowerCase()}`">{{ selectedCharacter?.name }}</h2>
                 <img :src="`${store.baseUrl}${selectedCharacter?.type.image}`" alt="">
                 <div class="life-bar" :class="lifeBarClass(selectedCharacter?.life)"
@@ -83,7 +83,7 @@ export default {
             <div>
                 <h1 class="text-white">VS</h1>
             </div>
-            <div class="character"> <!-- Nessuna classe speciale qui -->
+            <div v-if="randomCharacter" class="character"> <!-- Nessuna classe speciale qui -->
                 <h2 :class="`text-${this.randomCharacter?.type.name.toLowerCase()}`">{{ randomCharacter?.name }}</h2>
                 <img :src="`${store.baseUrl}${randomCharacter?.type.image}`" alt="">
                 <div class="life-bar" :class="lifeBarClass(randomCharacter?.life)"
