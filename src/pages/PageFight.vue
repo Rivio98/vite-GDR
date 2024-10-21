@@ -26,8 +26,12 @@ export default {
                 this.selectedCharacter = this.store.character;
 
                 if (this.selectedCharacter) {
+                    this.selectedCharacter.maxLife = this.selectedCharacter.life;
                     await this.store.getCharacters();
                     this.randomCharacter = this.getRandomCharacter(this.store.characters, this.selectedCharacter);
+                    if (this.randomCharacter) {
+                        this.randomCharacter.maxLife = this.randomCharacter.life;
+                    }
                 } else {
                     console.error("Personaggio selezionato non trovato");
                 }
@@ -46,27 +50,67 @@ export default {
         },
 
         async startFight() {
+
+            await new Promise(resolve => setTimeout(resolve, 3000));
+
             let turn = 0;
+
+            let attacker, defender;
+
+            if (this.selectedCharacter.speed >= this.randomCharacter.speed) {
+                attacker = this.selectedCharacter;
+                defender = this.randomCharacter;
+            } else {
+                attacker = this.randomCharacter;
+                defender = this.selectedCharacter;
+            }
+
             while (this.selectedCharacter.life > 0 && this.randomCharacter.life > 0) {
                 // Determina attaccante e difensore in base al turno
-                const attacker = turn % 2 === 0 ? this.selectedCharacter : this.randomCharacter;
-                const defender = turn % 2 === 0 ? this.randomCharacter : this.selectedCharacter;
-
                 this.currentAttacker = attacker;  // Imposta l'attaccante corrente
                 this.isAttacking = true;          // Attiva l'animazione di attacco
 
                 // Attendi il tempo dell'animazione prima di infliggere il danno
                 await new Promise(resolve => setTimeout(resolve, 500));  // Allineato alla durata dell'animazione
 
-                // Infliggi il danno quando l'attacco è completato
-                this.attack(attacker, defender);
+                if (attacker.speed >= defender.speed * 2) {
+                    // Primo attacco
+                    this.attack(attacker, defender);
+                    if (defender.life > 0) {
+                        // Aspetta per l'attacco successivo
+                        await new Promise(resolve => setTimeout(resolve, 500));
 
-                // Aspetta per far rientrare l'attaccante prima del prossimo turno
+                        this.isAttacking = false;
+                        await new Promise(resolve => setTimeout(resolve, 1000));
+                        this.isAttacking = true;
+                        await new Promise(resolve => setTimeout(resolve, 500));
+                        // Secondo attacco
+                        this.attack(attacker, defender);
+                    }
+                } else {
+                    // Attacca una sola volta
+                    this.attack(attacker, defender);
+                }
+
                 await new Promise(resolve => setTimeout(resolve, 500));
+
 
                 this.isAttacking = false;  // Disattiva l'animazione
 
+                if (defender.life > 0) {
+                    [attacker, defender] = [defender, attacker];  // Scambia l'attaccante e il difensore
+                }
+
                 await new Promise(resolve => setTimeout(resolve, 500));
+
+                if (this.selectedCharacter.life <= 0) {
+                    this.selectedCharacter.isDefeated = true;  // Aggiungi lo stato di sconfitta
+                    break;  // Termina il combattimento
+                } else if (this.randomCharacter.life <= 0) {
+                    this.randomCharacter.isDefeated = true;  // Aggiungi lo stato di sconfitta
+                    break;  // Termina il combattimento
+                }
+
 
                 turn++;
             }
@@ -80,7 +124,7 @@ export default {
         },
 
         attack(attacker, defender) {
-            const damage = attacker.strength - defender.defense;
+            const damage = (attacker.strength + attacker.intelligence) - defender.defense;
             const actualDamage = damage > 0 ? damage : 1; // Assicurati che ci sia almeno 1 danno
             defender.life -= actualDamage;
 
@@ -104,44 +148,51 @@ export default {
 
 
 <template>
-    <div class="fight-page">
-        <div class="fight-arena">
+    <section class="mt-5">
+        <h1 class="text-white text-center"><span :class="`text-${selectedCharacter?.type.name.toLowerCase()}`">{{
+            selectedCharacter.name }}</span>
+            VS <span :class="`text-${randomCharacter?.type.name.toLowerCase()}`">{{ randomCharacter.name }}</span>
+        </h1>
+        <div class="wrapper-life d-flex justify-content-around">
+            <div class="life-bar p-3 w-100 mx-3 position-relative">
+                <div class="life-fill-selected position-absolute h-100 border-1"
+                    :class="lifeBarClass(selectedCharacter?.life)"
+                    :style="{ width: `${(selectedCharacter?.life / selectedCharacter?.maxLife) * 100}%` }">
+                    <span v-if="selectedCharacter?.life != 0">{{ selectedCharacter?.life }}</span>
+                </div>
+            </div>
+            <div class="life-bar p-3 mx-3 w-100 position-relative">
+                <div class="life-fill-random position-absolute h-100 border-1"
+                    :class="lifeBarClass(randomCharacter?.life)"
+                    :style="{ width: `${(randomCharacter?.life / randomCharacter?.maxLife) * 100}%` }">
+                    {{ randomCharacter?.life }}</div>
+            </div>
+        </div>
+        <div class="fight-page">
+            <div class="fight-arena d-flex justify-content-center align-items-center">
+                <!-- Personaggio selezionato -->
+                <div v-if="selectedCharacter" class="character selected"
+                    :class="{ 'character-attack-left': isAttacking && currentAttacker === selectedCharacter }">
+                    <!-- <h2 :class="`text-${selectedCharacter?.type.name.toLowerCase()}`">{{ selectedCharacter?.name }}</h2> -->
 
-            <!-- Personaggio selezionato -->
-            <div v-if="selectedCharacter" class="character selected"
-                :class="{ 'character-attack-left': isAttacking && currentAttacker === selectedCharacter }">
-                <h2 :class="`text-${selectedCharacter?.type.name.toLowerCase()}`">{{ selectedCharacter?.name }}</h2>
+                    <img :src="`${store.baseUrl}${selectedCharacter?.type.image}`" alt="">
+                </div>
 
-                <img :src="`${store.baseUrl}${selectedCharacter?.type.image}`" alt="">
-                <div class="life-bar" :class="lifeBarClass(selectedCharacter?.life)"
-                    :style="{ width: `${selectedCharacter?.life}%` }">
-                    {{ selectedCharacter?.life }}
+                <!-- Personaggio casuale -->
+                <div v-if="randomCharacter" class="character"
+                    :class="{ 'character-attack-right': isAttacking && currentAttacker === randomCharacter }">
+                    <!-- <h2 :class="`text-${randomCharacter?.type.name.toLowerCase()}`">{{ randomCharacter?.name }}</h2> -->
+
+                    <img :src="`${store.baseUrl}${randomCharacter?.type.image}`" alt="">
                 </div>
             </div>
 
-            <div>
-                <h1 class="text-white">VS</h1>
-            </div>
-
-
-            <!-- Personaggio casuale -->
-            <div v-if="randomCharacter" class="character"
-                :class="{ 'character-attack-right': isAttacking && currentAttacker === randomCharacter }">
-                <h2 :class="`text-${randomCharacter?.type.name.toLowerCase()}`">{{ randomCharacter?.name }}</h2>
-
-                <img :src="`${store.baseUrl}${randomCharacter?.type.image}`" alt="">
-                <div class="life-bar" :class="lifeBarClass(randomCharacter?.life)"
-                    :style="{ width: `${randomCharacter?.life}%` }">
-                    {{ randomCharacter?.life }}
-                </div>
+            <!-- Risultato del combattimento -->
+            <div class="fight-result mt-4">
+                <h2 class="text-white">{{ fightResult }}</h2>
             </div>
         </div>
-
-        <!-- Risultato del combattimento -->
-        <div class="fight-result mt-4">
-            <h2 class="text-white">{{ fightResult }}</h2>
-        </div>
-    </div>
+    </section>
 </template>
 
 <style lang="scss" scoped>
@@ -183,7 +234,19 @@ export default {
     transform: translateX(-100px); // Muovi il personaggio casuale verso sinistra (attacco)
 }
 
+h1 {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.wrapper-life {
+    margin: 0 auto;
+    width: 100%;
+    max-width: 800px;
+}
+
 .life-bar {
+    max-width: 45%;
     height: 20px;
     border-radius: 5px;
     margin-top: 10px;
@@ -192,6 +255,31 @@ export default {
     display: flex;
     align-items: center;
     justify-content: center;
+    background-color: #9b9d9e;
+}
+
+.life-fill-selected {
+    color: white;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    left: 0;
+    border-radius: 5px;
+    transition: width 0.5s ease;
+}
+
+.life-fill-random {
+    color: white;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    right: 0;
+    border-radius: 5px;
+    transition: width 0.5s ease;
 }
 
 .life-bar-red {
