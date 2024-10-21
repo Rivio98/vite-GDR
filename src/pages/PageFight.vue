@@ -4,36 +4,27 @@ import { store } from '../store.js';
 export default {
     data() {
         return {
-            randomCharacter: null,  // Personaggio casuale
-            selectedCharacter: null,  // Personaggio selezionato
-            store,                  // Store reattivo
+            randomCharacter: null,
+            selectedCharacter: null,
+            store,
+            fightResult: null,
+            isAttacking: false,           // Per controllare quando un attacco è in corso
+            currentAttacker: null,        // Per sapere chi sta attaccando
         };
     },
 
     async created() {
-        // Ottieni lo slug dalla route e carica i personaggi
         const slug = this.$route.params.slug;
         await this.loadSelectedCharacters(slug);
+        this.startFight();  // Inizia il combattimento automaticamente
     },
 
     methods: {
-        lifeBarClass(life) {
-            if (life < 40) {
-                return 'life-bar-red';
-            } else if (life >= 40 && life < 60) {
-                return 'life-bar-yellow';
-            } else {
-                return 'life-bar-green';
-            }
-        },
-        // Funzione per caricare sia il personaggio selezionato che quello casuale
         async loadSelectedCharacters(slug) {
             try {
-                // Usa lo store per ottenere il personaggio selezionato
                 await this.store.getCharacter(slug);
-                this.selectedCharacter = this.store.character;  // Assegna il personaggio selezionato dallo store
+                this.selectedCharacter = this.store.character;
 
-                // Assicurati che `selectedCharacter` sia stato caricato prima di caricare tutti i personaggi
                 if (this.selectedCharacter) {
                     await this.store.getCharacters();
                     this.randomCharacter = this.getRandomCharacter(this.store.characters, this.selectedCharacter);
@@ -45,24 +36,65 @@ export default {
             }
         },
 
-        // Funzione per selezionare un personaggio casuale
         getRandomCharacter(characters, selectedCharacter) {
-            // Assicura che selectedCharacter non sia nullo
-            if (!selectedCharacter) {
-                return null;
-            }
-
-            // Crea un array che esclude il personaggio selezionato
             const filteredCharacters = characters.filter(character => character.slug !== selectedCharacter.slug);
-
-            // Se ci sono personaggi disponibili dopo il filtraggio, scegli uno casuale
             if (filteredCharacters.length > 0) {
                 const randomIndex = Math.floor(Math.random() * filteredCharacters.length);
                 return filteredCharacters[randomIndex];
             }
-
-            // In caso non ci siano personaggi disponibili, ritorna null
             return null;
+        },
+
+        async startFight() {
+    let turn = 0;
+    while (this.selectedCharacter.life > 0 && this.randomCharacter.life > 0) {
+        // Determina attaccante e difensore in base al turno
+        const attacker = turn % 2 === 0 ? this.selectedCharacter : this.randomCharacter;
+        const defender = turn % 2 === 0 ? this.randomCharacter : this.selectedCharacter;
+
+        this.currentAttacker = attacker;  // Imposta l'attaccante corrente
+        this.isAttacking = true;          // Attiva l'animazione di attacco
+
+        // Attendi il tempo dell'animazione prima di infliggere il danno
+        await new Promise(resolve => setTimeout(resolve, 500));  // Allineato alla durata dell'animazione
+
+        // Infliggi il danno quando l'attacco è completato
+        this.attack(attacker, defender);
+
+        // Aspetta per far rientrare l'attaccante prima del prossimo turno
+        await new Promise(resolve => setTimeout(resolve, 500));
+
+        this.isAttacking = false;  // Disattiva l'animazione
+
+        turn++;
+    }
+
+    // Determina il vincitore
+    if (this.selectedCharacter.life > 0) {
+        this.fightResult = `${this.selectedCharacter.name} vince!`;
+    } else {
+        this.fightResult = `${this.randomCharacter.name} vince!`;
+    }
+},
+
+attack(attacker, defender) {
+    const damage = attacker.strength - defender.defense;
+    const actualDamage = damage > 0 ? damage : 1; // Assicurati che ci sia almeno 1 danno
+    defender.life -= actualDamage;
+
+    if (defender.life < 0) {
+        defender.life = 0; // La vita non può scendere sotto 0
+    }
+},
+
+        lifeBarClass(life) {
+            if (life < 40) {
+                return 'life-bar-red';
+            } else if (life >= 40 && life < 60) {
+                return 'life-bar-yellow';
+            } else {
+                return 'life-bar-green';
+            }
         },
     },
 };
@@ -72,25 +104,38 @@ export default {
 <template>
     <div class="fight-page">
         <div class="fight-arena">
-            <div class="character selected"> <!-- Applica la classe selected dinamicamente -->
-                <h2 :class="`text-${store.character?.type.name.toLowerCase()}`">{{ selectedCharacter?.name }}</h2>
+            <!-- Personaggio selezionato -->
+            <div 
+                class="character selected"
+                :class="{ 'character-attack-left': isAttacking && currentAttacker === selectedCharacter }">
+                <h2 :class="`text-${selectedCharacter?.type.name.toLowerCase()}`">{{ selectedCharacter?.name }}</h2>
                 <img :src="`${store.baseUrl}${selectedCharacter?.type.image}`" alt="">
                 <div class="life-bar" :class="lifeBarClass(selectedCharacter?.life)"
                     :style="{ width: `${selectedCharacter?.life}%` }">
                     {{ selectedCharacter?.life }}
                 </div>
             </div>
+
             <div>
                 <h1 class="text-white">VS</h1>
             </div>
-            <div class="character"> <!-- Nessuna classe speciale qui -->
-                <h2 :class="`text-${this.randomCharacter?.type.name.toLowerCase()}`">{{ randomCharacter?.name }}</h2>
+
+            <!-- Personaggio casuale -->
+            <div 
+                class="character"
+                :class="{ 'character-attack-right': isAttacking && currentAttacker === randomCharacter }">
+                <h2 :class="`text-${randomCharacter?.type.name.toLowerCase()}`">{{ randomCharacter?.name }}</h2>
                 <img :src="`${store.baseUrl}${randomCharacter?.type.image}`" alt="">
                 <div class="life-bar" :class="lifeBarClass(randomCharacter?.life)"
                     :style="{ width: `${randomCharacter?.life}%` }">
                     {{ randomCharacter?.life }}
                 </div>
             </div>
+        </div>
+
+        <!-- Risultato del combattimento -->
+        <div class="fight-result mt-4">
+            <h2 class="text-white">{{ fightResult }}</h2>
         </div>
     </div>
 </template>
@@ -103,7 +148,6 @@ export default {
     margin-top: 30px;
 }
 
-
 .fight-arena {
     display: flex;
     justify-content: space-around;
@@ -113,6 +157,7 @@ export default {
 
 .character {
     width: 200px;
+    transition: transform 0.5s ease-in-out;  // Aggiungi transizione per l'attacco
 }
 
 .character img {
@@ -121,8 +166,17 @@ export default {
 }
 
 .character.selected img {
-    transform: scaleX(-1);
-    /* Specchia solo il personaggio selezionato */
+    transform: scaleX(-1);  // Specchia solo il personaggio selezionato
+}
+
+/* Animazione per l'attacco del personaggio selezionato (da sinistra a destra) */
+.character-attack-left {
+    transform: translateX(100px);  // Muovi il personaggio selezionato verso destra (attacco)
+}
+
+/* Animazione per l'attacco del personaggio casuale (da destra a sinistra) */
+.character-attack-right {
+    transform: translateX(-100px);  // Muovi il personaggio casuale verso sinistra (attacco)
 }
 
 .life-bar {
@@ -147,5 +201,12 @@ export default {
 
 .life-bar-green {
     background-color: green;
+}
+
+.fight-result {
+    margin-top: 20px;
+    h2 {
+        color: white;
+    }
 }
 </style>
