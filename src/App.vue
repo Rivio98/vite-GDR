@@ -22,7 +22,7 @@ export default {
 @use './styles/generals.scss';
 
 main {
-  height: calc(100vh - 60px);
+  height: calc(100vh - 45px);
 }
 
 section {
