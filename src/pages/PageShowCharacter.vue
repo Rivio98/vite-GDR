@@ -37,7 +37,7 @@ export default {
             </div>
 
 
-            <div class="container card character-card text-bg-dark py-3 px-0 rounded-5">
+            <div class="container card character-card b-grey text-bg-dark py-3 px-0 rounded-5">
                 <div class="row">
                     <div class="col-12">
                         <div class="content text-center">
@@ -51,12 +51,9 @@ export default {
                                                 character.type.name }}
                                             </span> &nbsp;
                                         </button>
-                                        <div class="dropdown-menu w-100 m-0 p-1 text-bg-dark text-center">
-                                            <div>
-                                                <h4 class="color_link rounded-top-5 m-0 p-1">Class:</h4>
-                                            </div>
-                                            <div class="text-center rounded-bottom-5">
-                                                <p class="overflow-auto">
+                                        <div class="dropdown-menu w-100 m-0 p-1 text-bg-dark text-center rounded-5">
+                                            <div class="text-center rounded-bottom-5 h-425">
+                                                <p class="overflow-auto h-100">
                                                     {{ character.type.description }}
                                                 </p>
                                             </div>
@@ -146,11 +143,22 @@ export default {
     color: $color_link;
 }
 
+.b-grey {
+    border: 5px solid rgb(72, 67, 67);
+}
+
+.h-425 {
+    height: 425px;
+}
+
 .character-card {
     #character-img {
         width: 300px;
         height: 300px;
     }
+
+
+
 
 
     #item-img {

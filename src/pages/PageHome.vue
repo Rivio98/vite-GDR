@@ -8,7 +8,7 @@ export default {
     <div class="container">
         <div class="row">
             <div class="col-12">
-                <div class="content text-center" id="home">
+                <div class="content text-center my-2" id="home">
                     <div>
                         <h1>Pixel GDR World</h1>
                         <p>Immergiti nel nostro fantastico mondo in pixel art</p>
@@ -33,6 +33,7 @@ export default {
     background-size: cover;
     display: flex;
     justify-content: center;
+
 
     align-items: center;
 
