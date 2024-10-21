@@ -104,11 +104,13 @@ attack(attacker, defender) {
 <template>
     <div class="fight-page">
         <div class="fight-arena">
+<<<<<<< HEAD
             <!-- Personaggio selezionato -->
-            <div 
+            <div  v-if="selectedCharacter"
                 class="character selected"
                 :class="{ 'character-attack-left': isAttacking && currentAttacker === selectedCharacter }">
                 <h2 :class="`text-${selectedCharacter?.type.name.toLowerCase()}`">{{ selectedCharacter?.name }}</h2>
+
                 <img :src="`${store.baseUrl}${selectedCharacter?.type.image}`" alt="">
                 <div class="life-bar" :class="lifeBarClass(selectedCharacter?.life)"
                     :style="{ width: `${selectedCharacter?.life}%` }">
@@ -120,11 +122,13 @@ attack(attacker, defender) {
                 <h1 class="text-white">VS</h1>
             </div>
 
+
             <!-- Personaggio casuale -->
-            <div 
+            <div  v-if="randomCharacter"
                 class="character"
                 :class="{ 'character-attack-right': isAttacking && currentAttacker === randomCharacter }">
                 <h2 :class="`text-${randomCharacter?.type.name.toLowerCase()}`">{{ randomCharacter?.name }}</h2>
+
                 <img :src="`${store.baseUrl}${randomCharacter?.type.image}`" alt="">
                 <div class="life-bar" :class="lifeBarClass(randomCharacter?.life)"
                     :style="{ width: `${randomCharacter?.life}%` }">
