@@ -37,7 +37,7 @@ export default {
                     class="btn btn-outline-info mx-3">
                     SHOW MORE
                 </router-link>
-                <button href="#" class="btn btn-outline-danger">MATCH</button>
+                <router-link :to="{name: 'fight', params: { slug: character.slug } }" class="btn btn-outline-danger"> FIGHT </router-link>
             </div>
         </div>
     </div>

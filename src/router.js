@@ -3,6 +3,7 @@ import PageHome from "./pages/PageHome.vue";
 import PageCharacters from "./pages/PageCharacters.vue";
 import PageNotFound from "./pages/PageNotFound.vue";
 import PageShowCharacter from "./pages/PageShowCharacter.vue";
+import PageFight from "./pages/PageFight.vue";
 
 
 const router = createRouter({
@@ -22,6 +23,11 @@ const router = createRouter({
             path: '/character/:slug',
             name: 'character',
             component: PageShowCharacter
+        },
+        {
+            path: '/fight',
+            name: 'fight',
+            component: PageFight
         },
         // {
         //     path: '/contacts',
