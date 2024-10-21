@@ -104,7 +104,7 @@ attack(attacker, defender) {
 <template>
     <div class="fight-page">
         <div class="fight-arena">
-<<<<<<< HEAD
+
             <!-- Personaggio selezionato -->
             <div  v-if="selectedCharacter"
                 class="character selected"
