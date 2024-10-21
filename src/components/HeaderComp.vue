@@ -46,7 +46,7 @@ export default {
 @use '../styles/variables/colorText' as *;
 
 header {
-  height: 60px;
+  height: 45px;
 }
 
 

@@ -15,7 +15,7 @@ export default {
 
 <template>
     <div class="col">
-        <div class="card h-100 text-bg-dark text-center rounded-5">
+        <div class="card b-grey h-100 text-bg-dark text-center rounded-5">
             <div class="text-center img-w">
                 <img :src="`${store.baseUrl}${character.type.image}`" class="card-img-top" alt="character IMG">
             </div>
@@ -80,5 +80,9 @@ img {
     &:nth-child(5) {
         color: darkseagreen;
     }
+}
+
+.b-grey {
+    border: 5px solid rgb(72, 67, 67);
 }
 </style>
