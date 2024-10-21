@@ -9,8 +9,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@fortawesome/fontawesome-free": "^6.6.0",
     "@esbuild/darwin-arm64": "^0.17.0",
+    "@fortawesome/fontawesome-free": "^6.6.0",
     "@rollup/rollup-darwin-arm64": "^4.24.0",
     "axios": "^1.7.7",
     "bootstrap": "^5.3.3",
