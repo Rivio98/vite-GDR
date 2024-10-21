@@ -1,87 +1,97 @@
 <script>
-import { store } from '../store.js'; // Importa lo store
+import { store } from '../store.js';
 
 export default {
-    props: {
-        slug: String,  // Ricevi lo slug del personaggio selezionato tramite props
-    },
-
     data() {
         return {
-        selectedCharacter: null,  // Il personaggio scelto dall'utente
-        randomCharacter: null,    // Un personaggio casuale
-        store,                    // Importiamo il reactive store
+        randomCharacter: null,  // Personaggio casuale
+        selectedCharacter: null,  // Personaggio selezionato
+        store,                  // Reactive store
         };
     },
 
-    mounted() {
-        // Chiama le funzioni nello store per ottenere i dati dei personaggi
-        this.store.getCharacter(this.slug);    // Ottieni il personaggio selezionato dallo store
-        this.store.getCharacters();            // Ottieni tutti i personaggi per selezionarne uno casuale
-        this.loadCharacters();
+    created() {
+        // Ottieni lo slug dalla route e carica i personaggi
+        const slug = this.$route.params.slug;
+        this.loadSelectedCharacters(slug);
     },
 
     methods: {
-        loadCharacters() {
-        // Usa un watcher per attendere il caricamento del personaggio selezionato e di tutti i personaggi
-        this.$watch(
-            () => this.store.character,
-            (newCharacter) => {
-            this.selectedCharacter = newCharacter; // Assegna il personaggio selezionato
-            }
-        );
+        // Funzione per caricare sia il personaggio selezionato che quello casuale
+        loadSelectedCharacters(slug) {
+            // Usa lo store per ottenere il personaggio selezionato
+            this.store.getCharacter(slug);
+            
+            // Carica tutti i personaggi
+            this.store.getCharacters();
+
+            // Imposta un piccolo timeout per attendere il caricamento (se necessario)
+            setTimeout(() => {
+                this.selectedCharacter = this.store.character;  // Assegna il personaggio selezionato dallo store
+                this.randomCharacter = this.getRandomCharacter(this.store.characters, this.selectedCharacter);  // Seleziona un personaggio casuale che non sia uguale a quello selezionato
+            }, 500);  // Aggiungi un ritardo per assicurarti che i dati siano caricati (in base alle tempistiche API)
+        },
+
+        // Funzione per selezionare un personaggio casuale
+        getRandomCharacter(characters, selectedCharacter) {
+        // Crea un array che esclude il personaggio selezionato
+        const filteredCharacters = characters.filter(character => character.slug !== selectedCharacter.slug);
         
-        this.$watch(
-            () => this.store.characters,
-            (characters) => {
-            if (characters.length > 0) {
-                this.randomCharacter = this.getRandomCharacter(characters); // Seleziona un personaggio casuale
-            }
-            }
-        );
+        // Se ci sono personaggi disponibili dopo il filtraggio, scegli uno casuale
+        if (filteredCharacters.length > 0) {
+            const randomIndex = Math.floor(Math.random() * filteredCharacters.length);
+            return filteredCharacters[randomIndex];
+        }
+        
+        // In caso non ci siano personaggi disponibili, ritorna null
+        return null;
+    }
     },
-    getRandomCharacter(characters) {
-      // Funzione per scegliere un personaggio casuale dalla lista dei personaggi
-      const randomIndex = Math.floor(Math.random() * characters.length);
-      return characters[randomIndex];
-    },
-  },
 };
 </script>
+
 <template>
         <div class="fight-page">
-        <h1>Fight: {{ selectedCharacter.name }} vs {{ randomCharacter.name }}</h1>
+        <h1 class="text-white">Fight: {{ selectedCharacter?.name }} vs {{ randomCharacter?.name }}</h1>
         <div class="fight-arena">
-            <div class="character">
-            <h2>{{ selectedCharacter.name }}</h2>
-            <img :src="`${store.baseUrl}${selectedCharacter.type.image}`" alt="Selected Character">
+            <div class="character selected">  <!-- Applica la classe selected dinamicamente -->
+            <h2 :class="`text-${store.character?.type.name.toLowerCase()}`">{{ selectedCharacter?.name }}</h2>
+            <img :src="`${store.baseUrl}${selectedCharacter?.type.image}`" alt="">
             </div>
-            <div class="character">
-            <h2>{{ randomCharacter.name }}</h2>
-            <img :src="`${store.baseUrl}${randomCharacter.type.image}`" alt="Random Character">
+            <div class="character">  <!-- Nessuna classe speciale qui -->
+            <h2 :class="`text-${this.randomCharacter?.type.name.toLowerCase()}`">{{ randomCharacter?.name }}</h2>
+            <img :src="`${store.baseUrl}${randomCharacter?.type.image}`" alt="">
             </div>
         </div>
         </div>
-  </template>
-  <style scoped>
-  .fight-page {
+</template>
+
+<style lang="scss" scoped>
+
+    @use '../styles/variables/color_classes' as *;
+
+    .fight-page {
     text-align: center;
     margin-top: 30px;
-  }
-  
-  .fight-arena {
+    }
+
+    .fight-arena {
     display: flex;
     justify-content: space-around;
     align-items: center;
     margin-top: 20px;
-  }
-  
-  .character {
+    }
+
+    .character {
     width: 200px;
-  }
-  
-  .character img {
+    }
+
+    .character img {
     width: 100%;
     border-radius: 10px;
-  }
-  </style>
+    }
+
+    .character.selected img {
+    transform: scaleX(-1);  /* Specchia solo il personaggio selezionato */
+    }
+</style>

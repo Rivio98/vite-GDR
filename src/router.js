@@ -25,7 +25,7 @@ const router = createRouter({
             component: PageShowCharacter
         },
         {
-            path: '/fight',
+            path: '/fight/:slug',
             name: 'fight',
             component: PageFight
         },
