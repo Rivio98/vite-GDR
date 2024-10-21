@@ -24,7 +24,7 @@ export default {
 
 <template>
     <section>
-        <div class="container mt-3 mb-2">
+        <div class="container mt-3 mb-2" v-if="character">
             <div class="row">
                 <div class="col-6">
                     <router-link :to="{ name: 'characters' }" class="text-decoration-none">
@@ -35,7 +35,6 @@ export default {
                     </router-link>
                 </div>
             </div>
-
 
             <div class="container card character-card b-grey text-bg-dark py-3 px-0 rounded-5">
                 <div class="row">
@@ -126,8 +125,8 @@ export default {
                 </div>
             </div>
         </div>
+        <div v-else class="text-center">Caricamento...</div>
     </section>
-
 </template>
 
 <style lang="scss" scoped>
