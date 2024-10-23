@@ -1,5 +1,6 @@
 <script>
 import { store } from '../store.js';
+
 import background1 from '../assets/background1.jpg';
 import background2 from '../assets/background2.jpg';
 import background3 from '../assets/background3.jpg';
@@ -8,7 +9,18 @@ import background5 from '../assets/background5.jpg';
 import background6 from '../assets/background6.jpg';
 import fightMusic from '../assets/fight-music.mp3';  // Add your fight music file here
 
+import ModalGameOver from '../components/ModalGameOver.vue';
+import Loader from '../components/Loader.vue';
+
+
+
 export default {
+    name: 'PageFight',
+    components: {
+        ModalGameOver,
+        Loader,
+    },
+
     data() {
         return {
             randomCharacter: null,
@@ -117,28 +129,28 @@ export default {
                 this.isAttacking = false;
 
                 if (defender.life > 0) {
-                    [attacker, defender] = [defender, attacker];
-                }
 
-                await new Promise(resolve => setTimeout(resolve, 500));
-
-                if (this.selectedCharacter.life <= 0) {
-                    this.selectedCharacter.isDefeated = true;
-                    break;
-                } else if (this.randomCharacter.life <= 0) {
-                    this.randomCharacter.isDefeated = true;
+                    [attacker, defender] = [defender, attacker];  // Scambia l'attaccante e il difensore
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                } else {
                     break;
                 }
 
-                turn++;
             }
+            turn++;
+
 
             this.stopFightMusic(); // Stop music on fight result
+
             if (this.selectedCharacter.life > 0) {
-                this.fightResult = `${this.selectedCharacter.name} vince!`;
+                this.fightResult = this.selectedCharacter.name;
             } else {
-                this.fightResult = `${this.randomCharacter.name} vince!`;
+                this.fightResult = this.randomCharacter.name;
             }
+
+            // Mostra la modale di successo
+            const successModal = new bootstrap.Modal(document.getElementById('game-over'));
+            successModal.show();
         },
 
         attack(attacker, defender) {
@@ -193,21 +205,24 @@ export default {
             } else {
                 return 'life-bar-green';
             }
+
         }
     }
-};
+
+}
+
+
 </script>
 
 <template>
-    <section
+    <Loader v-if="store.loading" />
+    <section v-else
         :style="{ backgroundImage: `url(${selectedBackground})`, backgroundSize: 'cover', backgroundPosition: 'center' }"
-        class="fight-page">
-        <h1 class="text-white text-center">
-            <span v-if="selectedCharacter" :class="`text-${selectedCharacter.type?.name.toLowerCase()}`">{{
-                selectedCharacter.name }}</span>
-            VS
-            <span v-if="randomCharacter" :class="`text-${randomCharacter.type?.name.toLowerCase()}`">{{
-                randomCharacter.name }}</span>
+        class="fight-page mt-5">
+        <h1 class="text-white text-center"><span :class="`text-${selectedCharacter?.type.name.toLowerCase()}`">{{
+            selectedCharacter.name }}</span>
+            VS <span :class="`text-${randomCharacter?.type.name.toLowerCase()}`">{{ randomCharacter.name
+                }}</span>
         </h1>
 
         <div class="wrapper-life d-flex justify-content-around">
@@ -233,6 +248,7 @@ export default {
                     :class="{ 'character-attack-left': isAttacking && currentAttacker === selectedCharacter, 'dodging-left': isMissing }">
                     <img :src="`${store.baseUrl}${selectedCharacter?.type.image}`" alt="">
                 </div>
+
                 <div v-if="randomCharacter" class="character"
                     :class="{ 'character-attack-right': isAttacking && currentAttacker === randomCharacter, 'dodging-right': isMissing }">
                     <img :src="`${store.baseUrl}${randomCharacter?.type.image}`" alt="">
@@ -245,7 +261,9 @@ export default {
                     {{ enemyDamageDealt !== null ? `Danno nemico inflitto: ${enemyDamageDealt}` : '' }}
                 </h3>
             </div>
+
         </div>
+        <ModalGameOver :fightResult="fightResult" :character="store.character" />
     </section>
 </template>
 
@@ -281,7 +299,13 @@ export default {
 }
 
 .character-attack-right {
-    transform: translateX(-100px);
+    transform: translateX(-100px); // Muovi il personaggio casuale verso sinistra (attacco)
+}
+
+
+h1 {
+    max-width: 1000px;
+    margin: 0 auto;
 }
 
 .wrapper-life {
@@ -312,5 +336,13 @@ export default {
 
 .life-bar-green {
     background-color: green;
+}
+
+.fight-result {
+    margin-top: 20px;
+
+    h2 {
+        color: white;
+    }
 }
 </style>

@@ -26,7 +26,7 @@ export default {
           aria-label="Toggle navigation">
           <i class="fa-solid fa-bars text-white"></i>
         </button>
-        <div class="collapse navbar-collapse justify-content-end" id="navbarNavAltMarkup">
+        <div class="collapse navbar-collapse justify-content-end bg-dark" id="navbarNavAltMarkup">
           <ul class="navbar-nav">
             <li v-for="item, in store.zuccherinos">
               <router-link class="nav-link col-link" :class="{ active: isActiveRoute(item.name) }" aria-current="page"
