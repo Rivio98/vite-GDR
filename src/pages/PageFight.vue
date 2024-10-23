@@ -40,8 +40,8 @@ export default {
                 background6
             ],
             damageDealt: null, // Store the latest damage dealt by the selected character
-            enemyDamageDealt: null, // Store the latest damage dealt by the random character
-            audio: null // Audio instance
+            audio: null, // Audio instance
+            isMusicPlaying: false, // Stato per sapere se la musica è attiva
         };
     },
 
@@ -148,9 +148,9 @@ export default {
                 this.fightResult = this.randomCharacter.name;
             }
 
-            // Mostra la modale di successo
             const successModal = new bootstrap.Modal(document.getElementById('game-over'));
             successModal.show();
+            // Mostra la modale di successo
         },
 
         attack(attacker, defender) {
@@ -158,7 +158,6 @@ export default {
             const probability_crit = Math.random();
             let damage;
             if (probability_miss < 0.2) {
-                this.isMissing = true;
                 damage = 0; // No damage when missing
             } else {
                 if (probability_crit < 0.2) {
@@ -166,17 +165,12 @@ export default {
                 } else {
                     damage = (attacker.strength + attacker.intelligence) - defender.defense;
                 }
-                defender.life -= damage;
-                this.damageDealt = damage;  // Update the latest damage dealt by the selected character
-
-                // Simulate random damage for the enemy character
-                this.enemyDamageDealt = Math.floor(Math.random() * 10) + 1;
-                if (defender === this.randomCharacter) {
-                    this.randomCharacter.life -= this.enemyDamageDealt;
-                } else {
-                    this.selectedCharacter.life -= this.enemyDamageDealt;
+                if (damage < 0) {
+                    damage = 0;
                 }
+                defender.life -= damage;
             }
+            this.damageDealt = damage;  // Update the latest damage dealt by the selected character
 
             if (defender.life < 0) {
                 defender.life = 0;
@@ -184,16 +178,29 @@ export default {
         },
 
         playFightMusic() {
-            this.audio = new Audio(fightMusic);
-            this.audio.loop = true;  // Loop the music
-            this.audio.volume = 0.1; // Set fixed volume to 10%
-            this.audio.play().catch(error => console.error("Failed to play music:", error));
+            // Verifica se l'audio è già in riproduzione
+            if (!this.audio) {
+                this.audio = new Audio(fightMusic);
+                this.audio.loop = true;
+                this.audio.volume = 0; // Imposta il volume a 0 inizialmente
+                this.audio.play().then(() => {
+                    // Dopo aver iniziato la musica, aumenta gradualmente il volume
+                    setTimeout(() => {
+                        this.audio.volume = 0.1; // Imposta il volume desiderato
+                        this.isMusicPlaying = true;
+                    }, 500);  // Aumenta il volume dopo 500 ms
+                }).catch(error => {
+                    console.error("Autoplay bloccato dal browser:", error);
+                });
+            }
         },
 
         stopFightMusic() {
             if (this.audio) {
                 this.audio.pause();
                 this.audio.currentTime = 0; // Reset to start
+                this.audio = null;
+                this.isMusicPlaying = false;
             }
         },
 
@@ -220,7 +227,7 @@ export default {
         :style="{ backgroundImage: `url(${selectedBackground})`, backgroundSize: 'cover', backgroundPosition: 'center' }"
         class="fight-page overflow-hidden d-flex justify-content-center align-items-center position-relative">
         <div>
-            <div class="title text-center w-100 position-absolute top-0 start-0 end-0 text-white bg-darker pb-4">
+            <div class="title text-center w-100 position-absolute top-0 start-0 end-0 text-white bg-darker py-4">
                 <h1 class=""><span :class="`text-${selectedCharacter?.type.name.toLowerCase()}`">{{
                     selectedCharacter.name }}</span>
                     VS <span :class="`text-${randomCharacter?.type.name.toLowerCase()}`">{{ randomCharacter.name
@@ -258,11 +265,10 @@ export default {
                 </div>
             </div>
         </div>
-        <div v-if="damageDealt !== null || enemyDamageDealt !== null"
+        <div v-if="damageDealt !== null"
             class="fight-result bg-darker text-white w-50 position-absolute bottom-0 rounded-4 rounded-bottom-0 p-3">
             <h3>
-                {{ damageDealt !== null ? `Hai inflitto: ${damageDealt} danni` : 'Lo hai mancato!' }}<br><br>
-                {{ enemyDamageDealt !== null ? `Hai subito: ${enemyDamageDealt} danni` : 'Ti ha mancato!' }}
+                {{ damageDealt === 0 ? 'MISS!' : `Danni inflitti: ${damageDealt}` }}<br><br>
             </h3>
         </div>
         <ModalGameOver :fightResult="fightResult" :character="store.character" />
