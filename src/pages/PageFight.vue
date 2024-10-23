@@ -220,7 +220,7 @@ export default {
         :style="{ backgroundImage: `url(${selectedBackground})`, backgroundSize: 'cover', backgroundPosition: 'center' }"
         class="fight-page overflow-hidden d-flex justify-content-center align-items-center position-relative">
         <div>
-            <div class="title text-center w-100 position-absolute top-0 start-0 end-0 text-bg-dark pb-4">
+            <div class="title text-center w-100 position-absolute top-0 start-0 end-0 text-white bg-darker pb-4">
                 <h1 class=""><span :class="`text-${selectedCharacter?.type.name.toLowerCase()}`">{{
                     selectedCharacter.name }}</span>
                     VS <span :class="`text-${randomCharacter?.type.name.toLowerCase()}`">{{ randomCharacter.name
@@ -259,7 +259,7 @@ export default {
             </div>
         </div>
         <div v-if="damageDealt !== null || enemyDamageDealt !== null"
-            class="fight-result text-bg-dark w-50 position-absolute bottom-0 rounded-4 rounded-bottom-0 p-3">
+            class="fight-result bg-darker text-white w-50 position-absolute bottom-0 rounded-4 rounded-bottom-0 p-3">
             <h3>
                 {{ damageDealt !== null ? `Hai inflitto: ${damageDealt} danni` : 'Lo hai mancato!' }}<br><br>
                 {{ enemyDamageDealt !== null ? `Hai subito: ${enemyDamageDealt} danni` : 'Ti ha mancato!' }}
@@ -271,6 +271,10 @@ export default {
 
 <style lang="scss" scoped>
 @use '../styles/variables/color_classes' as *;
+
+.bg-darker {
+    background-color: #212529b6;
+}
 
 .fight-page {
     text-align: center;
