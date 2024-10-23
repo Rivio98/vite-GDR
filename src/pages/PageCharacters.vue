@@ -1,11 +1,13 @@
 <script>
 import { store } from '../store.js';
 import CharacterCard from '../components/CharacterCard.vue';
+import Loader from '../components/Loader.vue';
 
 export default {
     name: 'PageCharacters',
     components: {
         CharacterCard,
+        Loader,
     },
     data() {
         return {
@@ -20,7 +22,9 @@ export default {
 </script>
 
 <template>
-    <section>
+
+    <Loader v-if="store.loading" />
+    <section v-else>
         <div class="container my-5 my-lg-3">
             <div class="row">
                 <div class="col-12">

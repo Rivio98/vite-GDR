@@ -1,8 +1,12 @@
 <script>
 import { store } from '../store.js';
+import Loader from '../components/Loader.vue';
+
 export default {
     name: 'PageShowCharacter',
-
+    components: {
+        Loader,
+    },
     data() {
         return {
             store,
@@ -23,7 +27,8 @@ export default {
 
 
 <template>
-    <section>
+    <Loader v-if="store.loading" />
+    <section v-else>
         <div class="container mt-3 mb-2">
             <div class="row">
                 <div class="col-6">

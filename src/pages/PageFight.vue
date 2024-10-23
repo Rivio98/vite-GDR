@@ -1,12 +1,14 @@
 <script>
 import { store } from '../store.js';
 import ModalGameOver from '../components/ModalGameOver.vue';
+import Loader from '../components/Loader.vue';
 
 
 export default {
     name: 'PageFight',
     components: {
         ModalGameOver,
+        Loader,
     },
 
     data() {
@@ -123,18 +125,6 @@ export default {
             // Mostra la modale di successo
             const successModal = new bootstrap.Modal(document.getElementById('game-over'));
             successModal.show();
-
-            // await new Promise(resolve => setTimeout(resolve, 500));
-
-            // if (this.selectedCharacter.life <= 0) {
-            //     this.selectedCharacter.isDefeated = true;  // Aggiungi lo stato di sconfitta
-            //     break;  // Termina il combattimento
-            // } else if (this.randomCharacter.life <= 0) {
-            //     this.randomCharacter.isDefeated = true;  // Aggiungi lo stato di sconfitta
-            //     break;  // Termina il combattimento
-            // }
-
-
         },
 
         attack(attacker, defender) {
@@ -176,7 +166,8 @@ export default {
 
 
 <template>
-    <section class="mt-5">
+    <Loader v-if="store.loading" />
+    <section v-else class="mt-5">
         <h1 class="text-white text-center"><span :class="`text-${selectedCharacter?.type.name.toLowerCase()}`">{{
             selectedCharacter.name }}</span>
             VS <span :class="`text-${randomCharacter?.type.name.toLowerCase()}`">{{ randomCharacter.name }}</span>
@@ -199,13 +190,11 @@ export default {
         </div>
         <div class="fight-page">
             <div class="fight-arena d-flex justify-content-center align-items-center">
-                <!-- Personaggio selezionato -->
                 <div v-if="selectedCharacter" class="character selected"
                     :class="{ 'character-attack-left': isAttacking && currentAttacker === selectedCharacter }, { 'dodging-left': isMissing }">
                     <img :src="`${store.baseUrl}${selectedCharacter?.type.image}`" alt="">
                 </div>
 
-                <!-- Personaggio casuale -->
                 <div v-if="randomCharacter" class="character"
                     :class="{ 'character-attack-right': isAttacking && currentAttacker === randomCharacter }, { 'dodging-right': isMissing }">
                     <img :src="`${store.baseUrl}${randomCharacter?.type.image}`" alt="">

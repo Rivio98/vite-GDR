@@ -11,6 +11,17 @@ export default {
     methods: {
         reloadPage() {
             window.location.reload(); // Forza il refresh della pagina
+        },
+        closeModalAndRedirect() {
+            // Nascondi la modale
+            const modalElement = document.getElementById('game-over');
+            const modal = bootstrap.Modal.getInstance(modalElement); // Ottieni l'istanza della modale
+            if (modal) {
+                modal.hide(); // Chiudi la modale
+            }
+
+            // Reindirizza alla pagina dei personaggi
+            this.$router.push({ name: 'characters' });
         }
     }
 
@@ -30,8 +41,9 @@ export default {
                     </div>
                     <div class="modal-footer">
                         <button @click="reloadPage" class="btn btn-secondary">Riprova</button>
-                        <router-link :to="{ name: 'characters' }" class="btn btn-primary">
-                            Cambia personaggio </router-link>
+                        <button @click="closeModalAndRedirect" class="btn btn-primary">
+                            Cambia personaggio
+                        </button>
                     </div>
                 </div>
             </div>
