@@ -218,10 +218,10 @@ export default {
     <Loader v-if="store.loading" />
     <section v-else
         :style="{ backgroundImage: `url(${selectedBackground})`, backgroundSize: 'cover', backgroundPosition: 'center' }"
-        class="fight-page overflow-hidden d-flex justify-content-center align-items-center">
+        class="fight-page overflow-hidden d-flex justify-content-center align-items-center position-relative">
         <div>
-            <div class="text-center">
-                <h1 class="text-white"><span :class="`text-${selectedCharacter?.type.name.toLowerCase()}`">{{
+            <div class="title text-center position-absolute start-50 translate-middle">
+                <h1 class="text-bg-dark"><span :class="`text-${selectedCharacter?.type.name.toLowerCase()}`">{{
                     selectedCharacter.name }}</span>
                     VS <span :class="`text-${randomCharacter?.type.name.toLowerCase()}`">{{ randomCharacter.name
                         }}</span>
@@ -276,12 +276,8 @@ export default {
     text-align: center;
 }
 
-
-.fight-arena {
-    display: flex;
-    justify-content: space-evenly;
-    align-items: center;
-    margin-top: 20px;
+.title.position-absolute {
+    top: 80px;
 }
 
 .character {
@@ -308,7 +304,7 @@ export default {
 
 
 h1 {
-    max-width: 1000px;
+    max-width: 1100px;
     margin: 0 auto;
 }
 
@@ -323,7 +319,7 @@ h1 {
     height: 20px;
     border-radius: 5px;
     margin-top: 10px;
-    color: white;
+    color: black;
     font-weight: bold;
     display: flex;
     align-items: center;
@@ -333,11 +329,27 @@ h1 {
 
 
 .life-fill-selected {
-    background-color: #2ECC71;
+    color: white;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    left: 0;
+    border-radius: 5px;
+    transition: width 0.5s ease;
 }
 
 .life-fill-random {
-    background-color: #E74C3C;
+    color: white;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    right: 0;
+    border-radius: 5px;
+    transition: width 0.5s ease;
 }
 
 .life-bar-red {
@@ -346,6 +358,7 @@ h1 {
 
 .life-bar-yellow {
     background-color: yellow;
+    color: black;
 }
 
 .life-bar-green {
