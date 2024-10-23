@@ -55,6 +55,11 @@ export default {
         this.stopFightMusic();  // Stop music when leaving the page
     },
 
+    beforeRouteLeave(to, from, next) {
+        this.stopFightMusic();  // Ferma la musica quando cambi rotta
+        next();  // Continua con il cambio di rotta
+    },
+
     methods: {
         async loadSelectedCharacters(slug) {
             try {
