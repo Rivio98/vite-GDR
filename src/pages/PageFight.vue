@@ -94,64 +94,64 @@ export default {
         },
 
         async startFight() {
-            await new Promise(resolve => setTimeout(resolve, 3000));
-            let turn = 0;
-            let attacker, defender;
+    await new Promise(resolve => setTimeout(resolve, 3000));
+    let turn = 0;
+    let attacker, defender;
 
-            if (this.selectedCharacter.speed >= this.randomCharacter.speed) {
-                attacker = this.selectedCharacter;
-                defender = this.randomCharacter;
-            } else {
-                attacker = this.randomCharacter;
-                defender = this.selectedCharacter;
-            }
+    if (this.selectedCharacter.speed >= this.randomCharacter.speed) {
+        attacker = this.selectedCharacter;
+        defender = this.randomCharacter;
+    } else {
+        attacker = this.randomCharacter;
+        defender = this.selectedCharacter;
+    }
 
-            while (this.selectedCharacter.life > 0 && this.randomCharacter.life > 0) {
-                this.currentAttacker = attacker;
-                this.isAttacking = true;
-                await new Promise(resolve => setTimeout(resolve, 500));
+    while (this.selectedCharacter.life > 0 && this.randomCharacter.life > 0) {
+        this.currentAttacker = attacker;
+        this.isAttacking = true;
+        await new Promise(resolve => setTimeout(resolve, 500));
 
-                if (attacker.speed >= defender.speed * 2) {
-                    this.attack(attacker, defender);
-                    if (defender.life > 0) {
-                        await new Promise(resolve => setTimeout(resolve, 500));
-                        this.isAttacking = false;
-                        await new Promise(resolve => setTimeout(resolve, 1000));
-                        this.isAttacking = true;
-                        await new Promise(resolve => setTimeout(resolve, 500));
-                        this.attack(attacker, defender);
-                    }
-                } else {
-                    this.attack(attacker, defender);
-                }
-
+        if (attacker.speed >= defender.speed * 2) {
+            this.attack(attacker, defender);
+            if (defender.life > 0) {
                 await new Promise(resolve => setTimeout(resolve, 500));
                 this.isAttacking = false;
-
-                if (defender.life > 0) {
-
-                    [attacker, defender] = [defender, attacker];  // Scambia l'attaccante e il difensore
-                    await new Promise(resolve => setTimeout(resolve, 500));
-                } else {
-                    break;
-                }
-
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                this.isAttacking = true;
+                await new Promise(resolve => setTimeout(resolve, 500));
+                this.attack(attacker, defender);
             }
-            turn++;
+        } else {
+            this.attack(attacker, defender);
+        }
 
+        await new Promise(resolve => setTimeout(resolve, 500));
+        this.isAttacking = false;
 
-            this.stopFightMusic(); // Stop music on fight result
+        if (defender.life > 0) {
+            [attacker, defender] = [defender, attacker];  // Scambia l'attaccante e il difensore
+            await new Promise(resolve => setTimeout(resolve, 500));
+        } else {
+            break;
+        }
+    }
 
-            if (this.selectedCharacter.life > 0) {
-                this.fightResult = this.selectedCharacter.name;
-            } else {
-                this.fightResult = this.randomCharacter.name;
-            }
+    turn++;
 
-            // Mostra la modale di successo
-            const successModal = new bootstrap.Modal(document.getElementById('game-over'));
-            successModal.show();
-        },
+    // Ferma la musica quando il combattimento è finito
+    this.stopFightMusic(); 
+
+    // Solo dopo che il combattimento è davvero finito, mostra il risultato
+    if (this.selectedCharacter.life > 0) {
+        this.fightResult = this.selectedCharacter.name;
+    } else {
+        this.fightResult = this.randomCharacter.name;
+    }
+
+    // Mostra la modale di fine combattimento una volta finito lo scontro
+    const successModal = new bootstrap.Modal(document.getElementById('game-over'));
+    successModal.show();
+},
 
         attack(attacker, defender) {
             const probability_miss = Math.random();
