@@ -258,8 +258,8 @@ export default {
                 </div>
             </div>
         </div>
-        <div class="fight-result text-bg-dark w-50 position-absolute bottom-0 rounded-4 rounded-bottom-0 p-3">
-            <h2 class="text-start">Console Log:</h2>
+        <div v-if="damageDealt !== null || enemyDamageDealt !== null"
+            class="fight-result text-bg-dark w-50 position-absolute bottom-0 rounded-4 rounded-bottom-0 p-3">
             <h3>
                 {{ damageDealt !== null ? `Hai inflitto: ${damageDealt} danni` : 'Lo hai mancato!' }}<br><br>
                 {{ enemyDamageDealt !== null ? `Hai subito: ${enemyDamageDealt} danni` : 'Ti ha mancato!' }}
