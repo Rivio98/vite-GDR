@@ -1,7 +1,14 @@
 <script>
 import { store } from '../store.js';
+import ModalGameOver from '../components/ModalGameOver.vue';
+
 
 export default {
+    name: 'PageFight',
+    components: {
+        ModalGameOver,
+    },
+
     data() {
         return {
             randomCharacter: null,
@@ -100,28 +107,34 @@ export default {
 
                 if (defender.life > 0) {
                     [attacker, defender] = [defender, attacker];  // Scambia l'attaccante e il difensore
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                } else {
+                    break;
                 }
-
-                await new Promise(resolve => setTimeout(resolve, 500));
-
-                if (this.selectedCharacter.life <= 0) {
-                    this.selectedCharacter.isDefeated = true;  // Aggiungi lo stato di sconfitta
-                    break;  // Termina il combattimento
-                } else if (this.randomCharacter.life <= 0) {
-                    this.randomCharacter.isDefeated = true;  // Aggiungi lo stato di sconfitta
-                    break;  // Termina il combattimento
-                }
-
-
-                turn++;
             }
+            turn++;
 
-            // Determina il vincitore
             if (this.selectedCharacter.life > 0) {
-                this.fightResult = `${this.selectedCharacter.name} vince!`;
+                this.fightResult = this.selectedCharacter.name;
             } else {
-                this.fightResult = `${this.randomCharacter.name} vince!`;
+                this.fightResult = this.randomCharacter.name;
             }
+
+            // Mostra la modale di successo
+            const successModal = new bootstrap.Modal(document.getElementById('game-over'));
+            successModal.show();
+
+            // await new Promise(resolve => setTimeout(resolve, 500));
+
+            // if (this.selectedCharacter.life <= 0) {
+            //     this.selectedCharacter.isDefeated = true;  // Aggiungi lo stato di sconfitta
+            //     break;  // Termina il combattimento
+            // } else if (this.randomCharacter.life <= 0) {
+            //     this.randomCharacter.isDefeated = true;  // Aggiungi lo stato di sconfitta
+            //     break;  // Termina il combattimento
+            // }
+
+
         },
 
         attack(attacker, defender) {
@@ -156,6 +169,7 @@ export default {
                 return 'life-bar-green';
             }
         },
+
     },
 };
 </script>
@@ -197,12 +211,8 @@ export default {
                     <img :src="`${store.baseUrl}${randomCharacter?.type.image}`" alt="">
                 </div>
             </div>
-
-            <!-- Risultato del combattimento -->
-            <div class="fight-result mt-4">
-                <h2 class="text-white">{{ fightResult }}</h2>
-            </div>
         </div>
+        <ModalGameOver :fightResult="fightResult" :character="store.character" />
     </section>
 </template>
 
@@ -246,15 +256,15 @@ export default {
 }
 
 /*.dodging-left {
-    transform: translateX(-100px); // Muovi il personaggio selezionato verso sinistra (dodging)
-}
+            transform: translateX(-100px); // Muovi il personaggio selezionato verso sinistra (dodging)
+            }
 
-.dodging-right {
-    transform: translateX(100px); // Muovi il personaggio casuale verso destra (dodging)
-}*/
+            .dodging-right {
+            transform: translateX(100px); // Muovi il personaggio casuale verso destra (dodging)
+            }*/
 
 h1 {
-    max-width: 800px;
+    max-width: 1000px;
     margin: 0 auto;
 }
 
