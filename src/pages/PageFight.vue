@@ -220,8 +220,8 @@ export default {
         :style="{ backgroundImage: `url(${selectedBackground})`, backgroundSize: 'cover', backgroundPosition: 'center' }"
         class="fight-page overflow-hidden d-flex justify-content-center align-items-center position-relative">
         <div>
-            <div class="title text-center position-absolute start-50 translate-middle">
-                <h1 class="text-bg-dark"><span :class="`text-${selectedCharacter?.type.name.toLowerCase()}`">{{
+            <div class="title text-center w-100 position-absolute top-0 start-0 end-0 text-bg-dark pb-4">
+                <h1 class=""><span :class="`text-${selectedCharacter?.type.name.toLowerCase()}`">{{
                     selectedCharacter.name }}</span>
                     VS <span :class="`text-${randomCharacter?.type.name.toLowerCase()}`">{{ randomCharacter.name
                         }}</span>
@@ -302,11 +302,6 @@ export default {
     transform: translateX(-100px); // Muovi il personaggio casuale verso sinistra (attacco)
 }
 
-
-h1 {
-    max-width: 1100px;
-    margin: 0 auto;
-}
 
 .wrapper-life {
     margin: 0 auto;
