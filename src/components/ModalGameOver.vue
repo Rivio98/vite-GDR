@@ -30,7 +30,8 @@ export default {
 
 <template>
     <div class="d-flex align-items-center justify-content-center min-vh-100">
-        <div class="modal fade" id="game-over" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
+        <div class="modal fade" id="game-over" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true"
+            data-bs-backdrop="static">
             <div class="modal-dialog modal-dialog-centered text-center">
                 <div class="modal-content text-bg-dark">
                     <div class="modal-header">
@@ -40,8 +41,8 @@ export default {
                         <p class="m-0">{{ fightResult }} vince!</p>
                     </div>
                     <div class="modal-footer">
-                        <button @click="reloadPage" class="btn btn-secondary">Riprova</button>
-                        <button @click="closeModalAndRedirect" class="btn btn-primary">
+                        <button @click="reloadPage" class="btn btn-primary">Riprova</button>
+                        <button @click="closeModalAndRedirect" class="btn btn-secondary">
                             Cambia personaggio
                         </button>
                     </div>
