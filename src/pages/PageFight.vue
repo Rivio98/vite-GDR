@@ -129,19 +129,19 @@ export default {
                 this.isAttacking = false;
 
                 if (defender.life > 0) {
-
                     [attacker, defender] = [defender, attacker];  // Scambia l'attaccante e il difensore
                     await new Promise(resolve => setTimeout(resolve, 500));
                 } else {
                     break;
                 }
-
             }
+
             turn++;
 
+            // Ferma la musica quando il combattimento è finito
+            this.stopFightMusic();
 
-            this.stopFightMusic(); // Stop music on fight result
-
+            // Solo dopo che il combattimento è davvero finito, mostra il risultato
             if (this.selectedCharacter.life > 0) {
                 this.fightResult = this.selectedCharacter.name;
             } else {
