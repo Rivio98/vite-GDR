@@ -1,11 +1,32 @@
 <script>
 export default {
     name: 'PageHome',
-
+    mounted() {
+        this.playMusic();
+    },
+    beforeDestroy() {
+        this.stopMusic();
+    },
+    methods: {
+        playMusic() {
+            const audio = document.getElementById('background-music');
+            audio.volume = 0.3;
+            audio.play();
+        },
+        stopMusic() {
+            const audio = document.getElementById('background-music');
+            audio.pause();
+            audio.currentTime = 0; // Riavvolgi il brano
+        }
+    }
 }
 </script>
 <template>
     <div class="container">
+        <audio id="background-music" loop>
+            <source src="../assets/home.mp3" type="audio/mpeg">
+            Your browser does not support the audio element.
+        </audio>
         <div class="row">
             <div class="col-12">
                 <div class="content text-center my-2" id="home">
@@ -13,8 +34,7 @@ export default {
                         <h1>Pixel GDR World</h1>
                         <p>Immergiti nel nostro fantastico mondo in pixel art</p>
                         <div>
-                            <router-link :to="{ name: 'characters' }" class="btn-start">Inizia
-                            </router-link>
+                            <router-link :to="{ name: 'characters' }" class="btn-start">Inizia</router-link>
                         </div>
                     </div>
                 </div>
@@ -33,8 +53,6 @@ export default {
     background-size: cover;
     display: flex;
     justify-content: center;
-
-
     align-items: center;
 
     h1 {
