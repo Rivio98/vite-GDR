@@ -1,5 +1,12 @@
 <script>
 import { store } from '../store.js';
+import background1 from '../assets/background1.jpg';
+import background2 from '../assets/background2.jpg';
+import background3 from '../assets/background3.jpg';
+import background4 from '../assets/background4.jpg';
+import background5 from '../assets/background5.jpg';
+import background6 from '../assets/background6.jpg';
+import fightMusic from '../assets/fight-music.mp3';  // Add your fight music file here
 
 export default {
     data() {
@@ -8,16 +15,33 @@ export default {
             selectedCharacter: null,
             store,
             fightResult: null,
-            isAttacking: false,           // Per controllare quando un attacco è in corso
+            isAttacking: false,
             currentAttacker: null,
-            isMissing: false,            // Per sapere chi sta attaccando
+            isMissing: false,
+            selectedBackground: '',
+            backgrounds: [
+                background1,
+                background2,
+                background3,
+                background4,
+                background5,
+                background6
+            ],
+            damageDealt: null, // Store the latest damage dealt
+            audio: null, // Audio instance
+            isMuted: false, // Mute state
+            volume: 0.5 // Default volume
         };
     },
 
     async created() {
         const slug = this.$route.params.slug;
         await this.loadSelectedCharacters(slug);
-        this.startFight();  // Inizia il combattimento automaticamente
+        this.playFightMusic();  // Start the fight music
+    },
+
+    beforeDestroy() {
+        this.stopFightMusic();  // Stop music when leaving the page
     },
 
     methods: {
@@ -33,6 +57,9 @@ export default {
                     if (this.randomCharacter) {
                         this.randomCharacter.maxLife = this.randomCharacter.life;
                     }
+
+                    this.getRandomBackground();
+                    this.startFight();
                 } else {
                     console.error("Personaggio selezionato non trovato");
                 }
@@ -50,12 +77,14 @@ export default {
             return null;
         },
 
+        getRandomBackground() {
+            const randomIndex = Math.floor(Math.random() * this.backgrounds.length);
+            this.selectedBackground = this.backgrounds[randomIndex];
+        },
+
         async startFight() {
-
             await new Promise(resolve => setTimeout(resolve, 3000));
-
             let turn = 0;
-
             let attacker, defender;
 
             if (this.selectedCharacter.speed >= this.randomCharacter.speed) {
@@ -67,56 +96,45 @@ export default {
             }
 
             while (this.selectedCharacter.life > 0 && this.randomCharacter.life > 0) {
-                // Determina attaccante e difensore in base al turno
-                this.currentAttacker = attacker;  // Imposta l'attaccante corrente
-                this.isAttacking = true;          // Attiva l'animazione di attacco
-
-                // Attendi il tempo dell'animazione prima di infliggere il danno
-                await new Promise(resolve => setTimeout(resolve, 500));  // Allineato alla durata dell'animazione
+                this.currentAttacker = attacker;
+                this.isAttacking = true;
+                await new Promise(resolve => setTimeout(resolve, 500));
 
                 if (attacker.speed >= defender.speed * 2) {
-                    // Primo attacco
                     this.attack(attacker, defender);
                     if (defender.life > 0) {
-                        // Aspetta per l'attacco successivo
                         await new Promise(resolve => setTimeout(resolve, 500));
-
                         this.isAttacking = false;
                         await new Promise(resolve => setTimeout(resolve, 1000));
                         this.isAttacking = true;
                         await new Promise(resolve => setTimeout(resolve, 500));
-                        // Secondo attacco
                         this.attack(attacker, defender);
                     }
                 } else {
-                    // Attacca una sola volta
                     this.attack(attacker, defender);
                 }
 
                 await new Promise(resolve => setTimeout(resolve, 500));
-
-
-                this.isAttacking = false;  // Disattiva l'animazione
+                this.isAttacking = false;
 
                 if (defender.life > 0) {
-                    [attacker, defender] = [defender, attacker];  // Scambia l'attaccante e il difensore
+                    [attacker, defender] = [defender, attacker];
                 }
 
                 await new Promise(resolve => setTimeout(resolve, 500));
 
                 if (this.selectedCharacter.life <= 0) {
-                    this.selectedCharacter.isDefeated = true;  // Aggiungi lo stato di sconfitta
-                    break;  // Termina il combattimento
+                    this.selectedCharacter.isDefeated = true;
+                    break;
                 } else if (this.randomCharacter.life <= 0) {
-                    this.randomCharacter.isDefeated = true;  // Aggiungi lo stato di sconfitta
-                    break;  // Termina il combattimento
+                    this.randomCharacter.isDefeated = true;
+                    break;
                 }
-
 
                 turn++;
             }
 
-            // Determina il vincitore
+            this.stopFightMusic(); // Stop music on fight result
             if (this.selectedCharacter.life > 0) {
                 this.fightResult = `${this.selectedCharacter.name} vince!`;
             } else {
@@ -129,22 +147,44 @@ export default {
             const probability_crit = Math.random();
             if (probability_miss < 0.2) {
                 this.isMissing = true;
-
-            }
-            else {
+            } else {
+                let damage;
                 if (probability_crit < 0.2) {
-                    const crit_damage = Math.floor((attacker.strength + attacker.intelligence) * 1.5) - defender.defense;
-                    defender.life -= crit_damage;
+                    damage = Math.floor((attacker.strength + attacker.intelligence) * 1.5) - defender.defense;
+                } else {
+                    damage = (attacker.strength + attacker.intelligence) - defender.defense;
                 }
-                else {
-                    const damage = (attacker.strength + attacker.intelligence) - defender.defense;
-                    defender.life -= damage;
-                }
+                defender.life -= damage;
+                this.damageDealt = damage;  // Update the latest damage dealt
             }
 
             if (defender.life < 0) {
-                defender.life = 0; // La vita non può scendere sotto 0
+                defender.life = 0;
             }
+        },
+
+        playFightMusic() {
+            this.audio = new Audio(fightMusic);
+            this.audio.loop = true;  // Loop the music
+            this.audio.volume = this.volume; // Set initial volume
+            this.audio.play().catch(error => console.error("Failed to play music:", error));
+        },
+
+        stopFightMusic() {
+            if (this.audio) {
+                this.audio.pause();
+                this.audio.currentTime = 0; // Reset to start
+            }
+        },
+
+        toggleMute() {
+            this.isMuted = !this.isMuted;
+            this.audio.muted = this.isMuted; // Mute or unmute
+        },
+
+        changeVolume(event) {
+            this.volume = event.target.value;
+            this.audio.volume = this.volume; // Change volume
         },
 
         lifeBarClass(life) {
@@ -155,60 +195,67 @@ export default {
             } else {
                 return 'life-bar-green';
             }
-        },
-    },
+        }
+    }
 };
 </script>
 
-
 <template>
-    <section class="mt-5">
-        <h1 class="text-white text-center"><span :class="`text-${selectedCharacter?.type.name.toLowerCase()}`">{{
-            selectedCharacter.name }}</span>
-            VS <span :class="`text-${randomCharacter?.type.name.toLowerCase()}`">{{ randomCharacter.name }}</span>
+    <section
+        :style="{ backgroundImage: `url(${selectedBackground})`, backgroundSize: 'cover', backgroundPosition: 'center' }"
+        class="fight-page">
+        <h1 class="text-white text-center">
+            <span v-if="selectedCharacter" :class="`text-${selectedCharacter.type?.name.toLowerCase()}`">{{
+                selectedCharacter.name }}</span>
+            VS
+            <span v-if="randomCharacter" :class="`text-${randomCharacter.type?.name.toLowerCase()}`">{{
+                randomCharacter.name }}</span>
         </h1>
+        <div class="row">
+            <div class="col-3">
+                <div class="content music-control text-center mt-4 d-flex bg-dark">
+                    <button @click="toggleMute">{{ isMuted ? 'Attiva Musica' : 'Disattiva Musica' }}</button>
+                    <input type="range" v-model="volume" min="0" max="1" step="0.1" @input="changeVolume">
+                    <label>{{ Math.round(volume * 100) }}%</label>
+                </div>
+            </div>
+        </div>
         <div class="wrapper-life d-flex justify-content-around">
             <div class="life-bar p-3 w-100 mx-3 position-relative">
                 <div class="life-fill-selected position-absolute h-100 border-1"
                     :class="lifeBarClass(selectedCharacter?.life)"
                     :style="{ width: `${(selectedCharacter?.life / selectedCharacter?.maxLife) * 100}%` }">
-                    <span v-if="selectedCharacter?.life != 0">{{ selectedCharacter?.life }}</span>
+                    <span v-if="selectedCharacter?.life !== 0">{{ selectedCharacter?.life }}</span>
                 </div>
             </div>
             <div class="life-bar p-3 mx-3 w-100 position-relative">
                 <div class="life-fill-random position-absolute h-100 border-1"
                     :class="lifeBarClass(randomCharacter?.life)"
                     :style="{ width: `${(randomCharacter?.life / randomCharacter?.maxLife) * 100}%` }">
-                    <span v-if="randomCharacter?.life != 0">{{ randomCharacter?.life }}</span>
+                    <span v-if="randomCharacter?.life !== 0">{{ randomCharacter?.life }}</span>
                 </div>
             </div>
         </div>
         <div class="fight-page">
             <div class="fight-arena d-flex justify-content-center align-items-center">
-                <!-- Personaggio selezionato -->
                 <div v-if="selectedCharacter" class="character selected"
-                    :class="{ 'character-attack-left': isAttacking && currentAttacker === selectedCharacter }, { 'dodging-left': isMissing }">
+                    :class="{ 'character-attack-left': isAttacking && currentAttacker === selectedCharacter, 'dodging-left': isMissing }">
                     <img :src="`${store.baseUrl}${selectedCharacter?.type.image}`" alt="">
                 </div>
-
-                <!-- Personaggio casuale -->
                 <div v-if="randomCharacter" class="character"
-                    :class="{ 'character-attack-right': isAttacking && currentAttacker === randomCharacter }, { 'dodging-right': isMissing }">
+                    :class="{ 'character-attack-right': isAttacking && currentAttacker === randomCharacter, 'dodging-right': isMissing }">
                     <img :src="`${store.baseUrl}${randomCharacter?.type.image}`" alt="">
                 </div>
             </div>
-
-            <!-- Risultato del combattimento -->
             <div class="fight-result mt-4">
-                <h2 class="text-white">{{ fightResult }}</h2>
+                <h2 class="text-white">{{ fightResult ?? 'In corso...' }}</h2>
+                <h3 class="text-white">{{ damageDealt !== null ? `Danno: ${damageDealt}` : '' }}</h3>
             </div>
         </div>
     </section>
 </template>
 
 <style lang="scss" scoped>
-@use '../styles/variables/color_classes' as *;
-
 .fight-page {
     text-align: center;
     margin-top: 30px;
@@ -216,14 +263,15 @@ export default {
 
 .fight-arena {
     display: flex;
-    justify-content: space-around;
+    justify-content: space-evenly;
+    /* Adjusted for spacing */
     align-items: center;
     margin-top: 20px;
 }
 
 .character {
     width: 200px;
-    transition: transform 0.5s ease-in-out; // Aggiungi transizione per l'attacco
+    transition: transform 0.5s ease-in-out;
 }
 
 .character img {
@@ -232,30 +280,15 @@ export default {
 }
 
 .character.selected img {
-    transform: scaleX(-1); // Specchia solo il personaggio selezionato
+    transform: scaleX(-1);
 }
 
-/* Animazione per l'attacco del personaggio selezionato (da sinistra a destra) */
 .character-attack-left {
-    transform: translateX(100px); // Muovi il personaggio selezionato verso destra (attacco)
+    transform: translateX(100px);
 }
 
-/* Animazione per l'attacco del personaggio casuale (da destra a sinistra) */
 .character-attack-right {
-    transform: translateX(-100px); // Muovi il personaggio casuale verso sinistra (attacco)
-}
-
-/*.dodging-left {
-    transform: translateX(-100px); // Muovi il personaggio selezionato verso sinistra (dodging)
-}
-
-.dodging-right {
-    transform: translateX(100px); // Muovi il personaggio casuale verso destra (dodging)
-}*/
-
-h1 {
-    max-width: 800px;
-    margin: 0 auto;
+    transform: translateX(-100px);
 }
 
 .wrapper-life {
@@ -266,39 +299,14 @@ h1 {
 
 .life-bar {
     max-width: 45%;
-    height: 20px;
-    border-radius: 5px;
-    margin-top: 10px;
-    color: white;
-    font-weight: bold;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: #9b9d9e;
 }
 
 .life-fill-selected {
-    color: white;
-    font-weight: bold;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-    left: 0;
-    border-radius: 5px;
-    transition: width 0.5s ease;
+    background-color: #2ECC71;
 }
 
 .life-fill-random {
-    color: white;
-    font-weight: bold;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-    right: 0;
-    border-radius: 5px;
-    transition: width 0.5s ease;
+    background-color: #E74C3C;
 }
 
 .life-bar-red {
@@ -307,18 +315,13 @@ h1 {
 
 .life-bar-yellow {
     background-color: yellow;
-    color: black;
 }
 
 .life-bar-green {
     background-color: green;
 }
 
-.fight-result {
+.music-control {
     margin-top: 20px;
-
-    h2 {
-        color: white;
-    }
 }
 </style>
