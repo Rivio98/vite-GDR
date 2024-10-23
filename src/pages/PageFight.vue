@@ -220,24 +220,26 @@ export default {
         :style="{ backgroundImage: `url(${selectedBackground})`, backgroundSize: 'cover', backgroundPosition: 'center' }"
         class="fight-page overflow-hidden d-flex justify-content-center align-items-center">
         <div>
-            <h1 class="text-white text-center"><span :class="`text-${selectedCharacter?.type.name.toLowerCase()}`">{{
-                selectedCharacter.name }}</span>
-                VS <span :class="`text-${randomCharacter?.type.name.toLowerCase()}`">{{ randomCharacter.name
-                    }}</span>
-            </h1>
-            <div class="wrapper-life d-flex justify-content-around m3-5">
-                <div class="life-bar p-3 w-100 mx-3 position-relative">
-                    <div class="life-fill-selected position-absolute h-100 border-1"
-                        :class="lifeBarClass(selectedCharacter?.life)"
-                        :style="{ width: `${(selectedCharacter?.life / selectedCharacter?.maxLife) * 100}%` }">
-                        <span v-if="selectedCharacter?.life !== 0">{{ selectedCharacter?.life }}</span>
+            <div class="text-center">
+                <h1 class="text-white"><span :class="`text-${selectedCharacter?.type.name.toLowerCase()}`">{{
+                    selectedCharacter.name }}</span>
+                    VS <span :class="`text-${randomCharacter?.type.name.toLowerCase()}`">{{ randomCharacter.name
+                        }}</span>
+                </h1>
+                <div class="wrapper-life d-flex justify-content-around m3-5">
+                    <div class="life-bar p-3 w-100 mx-3 position-relative">
+                        <div class="life-fill-selected position-absolute h-100 border-1"
+                            :class="lifeBarClass(selectedCharacter?.life)"
+                            :style="{ width: `${(selectedCharacter?.life / selectedCharacter?.maxLife) * 100}%` }">
+                            <span v-if="selectedCharacter?.life !== 0">{{ selectedCharacter?.life }}</span>
+                        </div>
                     </div>
-                </div>
-                <div class="life-bar p-3 mx-3 w-100 position-relative">
-                    <div class="life-fill-random position-absolute h-100 border-1"
-                        :class="lifeBarClass(randomCharacter?.life)"
-                        :style="{ width: `${(randomCharacter?.life / randomCharacter?.maxLife) * 100}%` }">
-                        <span v-if="randomCharacter?.life !== 0">{{ randomCharacter?.life }}</span>
+                    <div class="life-bar p-3 mx-3 w-100 position-relative">
+                        <div class="life-fill-random position-absolute h-100 border-1"
+                            :class="lifeBarClass(randomCharacter?.life)"
+                            :style="{ width: `${(randomCharacter?.life / randomCharacter?.maxLife) * 100}%` }">
+                            <span v-if="randomCharacter?.life !== 0">{{ randomCharacter?.life }}</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -254,12 +256,11 @@ export default {
                         <img :src="`${store.baseUrl}${randomCharacter?.type.image}`" alt="">
                     </div>
                 </div>
-                <div v-show="damageDealt || enemyDamageDealt"
-                    class="fight-result mt-5 ms-auto me-auto text-bg-dark w-100 rounded-3 p-2">
-                    <!-- <h2 class="text-white">{{ fightResult ?? 'In corso...' }}</h2> -->
+                <div class="fight-result mt-5 ms-auto me-auto text-bg-dark w-100 rounded-3 p-2">
+                    <h2 class="text-start">Console Log:</h2>
                     <h3>
-                        {{ damageDealt !== null ? `Hai inflitto: ${damageDealt} danni` : '' }}<br><br>
-                        {{ enemyDamageDealt !== null ? `Hai subito: ${enemyDamageDealt} danni` : '' }}
+                        {{ damageDealt !== null ? `Hai inflitto: ${damageDealt} danni` : 'Lo hai mancato!' }}<br><br>
+                        {{ enemyDamageDealt !== null ? `Hai subito: ${enemyDamageDealt} danni` : 'Ti ha mancato!' }}
                     </h3>
                 </div>
             </div>
@@ -269,9 +270,12 @@ export default {
 </template>
 
 <style lang="scss" scoped>
+@use '../styles/variables/color_classes' as *;
+
 .fight-page {
     text-align: center;
 }
+
 
 .fight-arena {
     display: flex;
