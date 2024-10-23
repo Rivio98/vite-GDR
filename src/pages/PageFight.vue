@@ -218,50 +218,51 @@ export default {
     <Loader v-if="store.loading" />
     <section v-else
         :style="{ backgroundImage: `url(${selectedBackground})`, backgroundSize: 'cover', backgroundPosition: 'center' }"
-        class="fight-page mt-5">
-        <h1 class="text-white text-center"><span :class="`text-${selectedCharacter?.type.name.toLowerCase()}`">{{
-            selectedCharacter.name }}</span>
-            VS <span :class="`text-${randomCharacter?.type.name.toLowerCase()}`">{{ randomCharacter.name
-                }}</span>
-        </h1>
-
-        <div class="wrapper-life d-flex justify-content-around">
-            <div class="life-bar p-3 w-100 mx-3 position-relative">
-                <div class="life-fill-selected position-absolute h-100 border-1"
-                    :class="lifeBarClass(selectedCharacter?.life)"
-                    :style="{ width: `${(selectedCharacter?.life / selectedCharacter?.maxLife) * 100}%` }">
-                    <span v-if="selectedCharacter?.life !== 0">{{ selectedCharacter?.life }}</span>
+        class="fight-page overflow-hidden d-flex justify-content-center align-items-center">
+        <div>
+            <h1 class="text-white text-center"><span :class="`text-${selectedCharacter?.type.name.toLowerCase()}`">{{
+                selectedCharacter.name }}</span>
+                VS <span :class="`text-${randomCharacter?.type.name.toLowerCase()}`">{{ randomCharacter.name
+                    }}</span>
+            </h1>
+            <div class="wrapper-life d-flex justify-content-around m3-5">
+                <div class="life-bar p-3 w-100 mx-3 position-relative">
+                    <div class="life-fill-selected position-absolute h-100 border-1"
+                        :class="lifeBarClass(selectedCharacter?.life)"
+                        :style="{ width: `${(selectedCharacter?.life / selectedCharacter?.maxLife) * 100}%` }">
+                        <span v-if="selectedCharacter?.life !== 0">{{ selectedCharacter?.life }}</span>
+                    </div>
+                </div>
+                <div class="life-bar p-3 mx-3 w-100 position-relative">
+                    <div class="life-fill-random position-absolute h-100 border-1"
+                        :class="lifeBarClass(randomCharacter?.life)"
+                        :style="{ width: `${(randomCharacter?.life / randomCharacter?.maxLife) * 100}%` }">
+                        <span v-if="randomCharacter?.life !== 0">{{ randomCharacter?.life }}</span>
+                    </div>
                 </div>
             </div>
-            <div class="life-bar p-3 mx-3 w-100 position-relative">
-                <div class="life-fill-random position-absolute h-100 border-1"
-                    :class="lifeBarClass(randomCharacter?.life)"
-                    :style="{ width: `${(randomCharacter?.life / randomCharacter?.maxLife) * 100}%` }">
-                    <span v-if="randomCharacter?.life !== 0">{{ randomCharacter?.life }}</span>
+
+            <div class="fight-page">
+                <div class="fight-arena d-flex justify-content-center align-items-center">
+                    <div v-if="selectedCharacter" class="character selected"
+                        :class="{ 'character-attack-left': isAttacking && currentAttacker === selectedCharacter, 'dodging-left': isMissing }">
+                        <img :src="`${store.baseUrl}${selectedCharacter?.type.image}`" alt="">
+                    </div>
+
+                    <div v-if="randomCharacter" class="character"
+                        :class="{ 'character-attack-right': isAttacking && currentAttacker === randomCharacter, 'dodging-right': isMissing }">
+                        <img :src="`${store.baseUrl}${randomCharacter?.type.image}`" alt="">
+                    </div>
+                </div>
+                <div v-show="damageDealt || enemyDamageDealt"
+                    class="fight-result mt-5 ms-auto me-auto text-bg-dark w-100 rounded-3 p-2">
+                    <!-- <h2 class="text-white">{{ fightResult ?? 'In corso...' }}</h2> -->
+                    <h3>
+                        {{ damageDealt !== null ? `Hai inflitto: ${damageDealt} danni` : '' }}<br><br>
+                        {{ enemyDamageDealt !== null ? `Hai subito: ${enemyDamageDealt} danni` : '' }}
+                    </h3>
                 </div>
             </div>
-        </div>
-
-        <div class="fight-page">
-            <div class="fight-arena d-flex justify-content-center align-items-center">
-                <div v-if="selectedCharacter" class="character selected"
-                    :class="{ 'character-attack-left': isAttacking && currentAttacker === selectedCharacter, 'dodging-left': isMissing }">
-                    <img :src="`${store.baseUrl}${selectedCharacter?.type.image}`" alt="">
-                </div>
-
-                <div v-if="randomCharacter" class="character"
-                    :class="{ 'character-attack-right': isAttacking && currentAttacker === randomCharacter, 'dodging-right': isMissing }">
-                    <img :src="`${store.baseUrl}${randomCharacter?.type.image}`" alt="">
-                </div>
-            </div>
-            <div class="fight-result mt-4">
-                <h2 class="text-white">{{ fightResult ?? 'In corso...' }}</h2>
-                <h3 class="text-white">
-                    {{ damageDealt !== null ? `Danno inflitto: ${damageDealt}` : '' }}<br />
-                    {{ enemyDamageDealt !== null ? `Danno nemico inflitto: ${enemyDamageDealt}` : '' }}
-                </h3>
-            </div>
-
         </div>
         <ModalGameOver :fightResult="fightResult" :character="store.character" />
     </section>
@@ -270,7 +271,6 @@ export default {
 <style lang="scss" scoped>
 .fight-page {
     text-align: center;
-    margin-top: 30px;
 }
 
 .fight-arena {
@@ -316,7 +316,17 @@ h1 {
 
 .life-bar {
     max-width: 45%;
+    height: 20px;
+    border-radius: 5px;
+    margin-top: 10px;
+    color: white;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #9b9d9e;
 }
+
 
 .life-fill-selected {
     background-color: #2ECC71;
