@@ -27,10 +27,9 @@ export default {
                 background5,
                 background6
             ],
-            damageDealt: null, // Store the latest damage dealt
-            audio: null, // Audio instance
-            isMuted: false, // Mute state
-            volume: 0.5 // Default volume
+            damageDealt: null, // Store the latest damage dealt by the selected character
+            enemyDamageDealt: null, // Store the latest damage dealt by the random character
+            audio: null // Audio instance
         };
     },
 
@@ -145,17 +144,26 @@ export default {
         attack(attacker, defender) {
             const probability_miss = Math.random();
             const probability_crit = Math.random();
+            let damage;
             if (probability_miss < 0.2) {
                 this.isMissing = true;
+                damage = 0; // No damage when missing
             } else {
-                let damage;
                 if (probability_crit < 0.2) {
                     damage = Math.floor((attacker.strength + attacker.intelligence) * 1.5) - defender.defense;
                 } else {
                     damage = (attacker.strength + attacker.intelligence) - defender.defense;
                 }
                 defender.life -= damage;
-                this.damageDealt = damage;  // Update the latest damage dealt
+                this.damageDealt = damage;  // Update the latest damage dealt by the selected character
+
+                // Simulate random damage for the enemy character
+                this.enemyDamageDealt = Math.floor(Math.random() * 10) + 1;
+                if (defender === this.randomCharacter) {
+                    this.randomCharacter.life -= this.enemyDamageDealt;
+                } else {
+                    this.selectedCharacter.life -= this.enemyDamageDealt;
+                }
             }
 
             if (defender.life < 0) {
@@ -166,7 +174,7 @@ export default {
         playFightMusic() {
             this.audio = new Audio(fightMusic);
             this.audio.loop = true;  // Loop the music
-            this.audio.volume = this.volume; // Set initial volume
+            this.audio.volume = 0.1; // Set fixed volume to 10%
             this.audio.play().catch(error => console.error("Failed to play music:", error));
         },
 
@@ -175,16 +183,6 @@ export default {
                 this.audio.pause();
                 this.audio.currentTime = 0; // Reset to start
             }
-        },
-
-        toggleMute() {
-            this.isMuted = !this.isMuted;
-            this.audio.muted = this.isMuted; // Mute or unmute
-        },
-
-        changeVolume(event) {
-            this.volume = event.target.value;
-            this.audio.volume = this.volume; // Change volume
         },
 
         lifeBarClass(life) {
@@ -211,15 +209,7 @@ export default {
             <span v-if="randomCharacter" :class="`text-${randomCharacter.type?.name.toLowerCase()}`">{{
                 randomCharacter.name }}</span>
         </h1>
-        <div class="row">
-            <div class="col-3">
-                <div class="content music-control text-center mt-4 d-flex bg-dark">
-                    <button @click="toggleMute">{{ isMuted ? 'Attiva Musica' : 'Disattiva Musica' }}</button>
-                    <input type="range" v-model="volume" min="0" max="1" step="0.1" @input="changeVolume">
-                    <label>{{ Math.round(volume * 100) }}%</label>
-                </div>
-            </div>
-        </div>
+
         <div class="wrapper-life d-flex justify-content-around">
             <div class="life-bar p-3 w-100 mx-3 position-relative">
                 <div class="life-fill-selected position-absolute h-100 border-1"
@@ -236,6 +226,7 @@ export default {
                 </div>
             </div>
         </div>
+
         <div class="fight-page">
             <div class="fight-arena d-flex justify-content-center align-items-center">
                 <div v-if="selectedCharacter" class="character selected"
@@ -249,7 +240,10 @@ export default {
             </div>
             <div class="fight-result mt-4">
                 <h2 class="text-white">{{ fightResult ?? 'In corso...' }}</h2>
-                <h3 class="text-white">{{ damageDealt !== null ? `Danno: ${damageDealt}` : '' }}</h3>
+                <h3 class="text-white">
+                    {{ damageDealt !== null ? `Danno inflitto: ${damageDealt}` : '' }}<br />
+                    {{ enemyDamageDealt !== null ? `Danno nemico inflitto: ${enemyDamageDealt}` : '' }}
+                </h3>
             </div>
         </div>
     </section>
@@ -264,7 +258,6 @@ export default {
 .fight-arena {
     display: flex;
     justify-content: space-evenly;
-    /* Adjusted for spacing */
     align-items: center;
     margin-top: 20px;
 }
@@ -319,9 +312,5 @@ export default {
 
 .life-bar-green {
     background-color: green;
-}
-
-.music-control {
-    margin-top: 20px;
 }
 </style>
