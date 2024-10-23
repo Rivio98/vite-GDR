@@ -7,7 +7,7 @@ import background3 from '../assets/background3.jpg';
 import background4 from '../assets/background4.jpg';
 import background5 from '../assets/background5.jpg';
 import background6 from '../assets/background6.jpg';
-import fightMusic from '../assets/fight-music.mp3';  // Add your fight music file here
+import fightMusic from '../assets/fight-music.mp3';
 
 import ModalGameOver from '../components/ModalGameOver.vue';
 import Loader from '../components/Loader.vue';
@@ -39,25 +39,25 @@ export default {
                 background5,
                 background6
             ],
-            damageDealt: null, // Store the latest damage dealt by the selected character
-            audio: null, // Audio instance
-            isMusicPlaying: false, // Stato per sapere se la musica è attiva
+            damageDealt: null,
+            audio: null,
+            isMusicPlaying: false,
         };
     },
 
     async created() {
         const slug = this.$route.params.slug;
         await this.loadSelectedCharacters(slug);
-        this.playFightMusic();  // Start the fight music
+        this.playFightMusic();
     },
 
     beforeDestroy() {
-        this.stopFightMusic();  // Stop music when leaving the page
+        this.stopFightMusic();
     },
 
     beforeRouteLeave(to, from, next) {
-        this.stopFightMusic();  // Ferma la musica quando cambi rotta
-        next();  // Continua con il cambio di rotta
+        this.stopFightMusic();
+        next();
     },
 
     methods: {
@@ -143,10 +143,8 @@ export default {
 
             turn++;
 
-            // Ferma la musica quando il combattimento è finito
             this.stopFightMusic();
 
-            // Solo dopo che il combattimento è davvero finito, mostra il risultato
             if (this.selectedCharacter.life > 0) {
                 this.fightResult = this.selectedCharacter.name;
             } else {
@@ -155,7 +153,6 @@ export default {
 
             const successModal = new bootstrap.Modal(document.getElementById('game-over'));
             successModal.show();
-            // Mostra la modale di successo
         },
 
         attack(attacker, defender) {
@@ -163,7 +160,7 @@ export default {
             const probability_crit = Math.random();
             let damage;
             if (probability_miss < 0.2) {
-                damage = 0; // No damage when missing
+                damage = 0;
             } else {
                 if (probability_crit < 0.2) {
                     damage = Math.floor((attacker.strength + attacker.intelligence) * 1.5) - defender.defense;
@@ -175,7 +172,7 @@ export default {
                 }
                 defender.life -= damage;
             }
-            this.damageDealt = damage;  // Update the latest damage dealt by the selected character
+            this.damageDealt = damage;
 
             if (defender.life < 0) {
                 defender.life = 0;
@@ -183,17 +180,17 @@ export default {
         },
 
         playFightMusic() {
-            // Verifica se l'audio è già in riproduzione
+
             if (!this.audio) {
                 this.audio = new Audio(fightMusic);
                 this.audio.loop = true;
-                this.audio.volume = 0; // Imposta il volume a 0 inizialmente
+                this.audio.volume = 0;
                 this.audio.play().then(() => {
-                    // Dopo aver iniziato la musica, aumenta gradualmente il volume
+
                     setTimeout(() => {
-                        this.audio.volume = 0.1; // Imposta il volume desiderato
+                        this.audio.volume = 0.1;
                         this.isMusicPlaying = true;
-                    }, 500);  // Aumenta il volume dopo 500 ms
+                    }, 500);
                 }).catch(error => {
                     console.error("Autoplay bloccato dal browser:", error);
                 });
@@ -203,7 +200,7 @@ export default {
         stopFightMusic() {
             if (this.audio) {
                 this.audio.pause();
-                this.audio.currentTime = 0; // Reset to start
+                this.audio.currentTime = 0;
                 this.audio = null;
                 this.isMusicPlaying = false;
             }
@@ -314,7 +311,7 @@ export default {
 }
 
 .character-attack-right {
-    transform: translateX(-100px); // Muovi il personaggio casuale verso sinistra (attacco)
+    transform: translateX(-100px);
 }
 
 

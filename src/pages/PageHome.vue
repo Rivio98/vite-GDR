@@ -16,7 +16,7 @@ export default {
         stopMusic() {
             const audio = document.getElementById('background-music');
             audio.pause();
-            audio.currentTime = 0; // Riavvolgi il brano
+            audio.currentTime = 0;
         }
     }
 }

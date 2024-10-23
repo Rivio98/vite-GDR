@@ -9,7 +9,7 @@ export default {
     <section class="d-flex justify-content-center align-items-center">
 
         <div class="loader">
-            <!-- Top -->
+
             <div id="block_01" class="block active"></div>
             <div id="block_02" class="block active"></div>
             <div id="block_03" class="block active"></div>
@@ -17,7 +17,7 @@ export default {
 
             <div id="block_0a" class="block active"></div>
 
-            <!-- Right -->
+
             <div id="block_05" class="block"></div>
             <div id="block_06" class="block"></div>
             <div id="block_07" class="block"></div>
@@ -25,7 +25,7 @@ export default {
 
             <div id="block_0b" class="block"></div>
 
-            <!-- Bottom -->
+
             <div id="block_09" class="block"></div>
             <div id="block_10" class="block"></div>
             <div id="block_11" class="block"></div>
@@ -33,7 +33,7 @@ export default {
 
             <div id="block_0c" class="block"></div>
 
-            <!-- Left -->
+
             <div id="block_13" class="block"></div>
             <div id="block_14" class="block"></div>
             <div id="block_15" class="block"></div>
@@ -67,7 +67,7 @@ export default {
     background: #FE6D17;
 }
 
-/* Top Blocks */
+
 #block_01 {
     top: 0px;
     left: 20px
@@ -88,13 +88,13 @@ export default {
     left: 50px
 }
 
-/* Top-Right Corner */
+
 #block_0a {
     top: 10px;
     left: 60px
 }
 
-/* Right Blocks */
+
 #block_05 {
     top: 20px;
     left: 70px
@@ -115,13 +115,13 @@ export default {
     left: 70px
 }
 
-/* Bottom-Right Corner */
+
 #block_0b {
     top: 60px;
     left: 60px
 }
 
-/* Bottom Blocks */
+
 #block_09 {
     top: 70px;
     left: 50px
@@ -142,13 +142,13 @@ export default {
     left: 20px
 }
 
-/* Bottom-Left Corner */
+
 #block_0c {
     top: 60px;
     left: 10px
 }
 
-/* Left Blocks */
+
 #block_13 {
     top: 20px;
     left: 0px
@@ -169,7 +169,7 @@ export default {
     left: 0px
 }
 
-/* Top-Left Corner */
+
 #block_0d {
     top: 10px;
     left: 10px
@@ -185,22 +185,18 @@ export default {
         transform: rotate(0deg);
     }
 
-    /*   12.5% { transform: rotate(45deg); } */
     25% {
         transform: rotate(90deg);
     }
 
-    /*   37.5% { transform: rotate(135deg); } */
     50% {
         transform: rotate(180deg);
     }
 
-    /*   62.5% { transform: rotate(225deg); } */
     75% {
         transform: rotate(270deg);
     }
 
-    /*   87.5% { transform: rotate(315deg); } */
     100% {
         transform: rotate(360deg);
     }

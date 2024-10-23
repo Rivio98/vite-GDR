@@ -10,17 +10,16 @@ export default {
     },
     methods: {
         reloadPage() {
-            window.location.reload(); // Forza il refresh della pagina
+            window.location.reload();
         },
         closeModalAndRedirect() {
-            // Nascondi la modale
+
             const modalElement = document.getElementById('game-over');
-            const modal = bootstrap.Modal.getInstance(modalElement); // Ottieni l'istanza della modale
+            const modal = bootstrap.Modal.getInstance(modalElement);
             if (modal) {
-                modal.hide(); // Chiudi la modale
+                modal.hide();
             }
 
-            // Reindirizza alla pagina dei personaggi
             this.$router.push({ name: 'characters' });
         }
     }
