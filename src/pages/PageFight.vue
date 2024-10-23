@@ -256,14 +256,14 @@ export default {
                         <img :src="`${store.baseUrl}${randomCharacter?.type.image}`" alt="">
                     </div>
                 </div>
-                <div class="fight-result mt-5 ms-auto me-auto text-bg-dark w-100 rounded-3 p-2">
-                    <h2 class="text-start">Console Log:</h2>
-                    <h3>
-                        {{ damageDealt !== null ? `Hai inflitto: ${damageDealt} danni` : 'Lo hai mancato!' }}<br><br>
-                        {{ enemyDamageDealt !== null ? `Hai subito: ${enemyDamageDealt} danni` : 'Ti ha mancato!' }}
-                    </h3>
-                </div>
             </div>
+        </div>
+        <div class="fight-result text-bg-dark w-50 position-absolute bottom-0 rounded-4 rounded-bottom-0 p-3">
+            <h2 class="text-start">Console Log:</h2>
+            <h3>
+                {{ damageDealt !== null ? `Hai inflitto: ${damageDealt} danni` : 'Lo hai mancato!' }}<br><br>
+                {{ enemyDamageDealt !== null ? `Hai subito: ${enemyDamageDealt} danni` : 'Ti ha mancato!' }}
+            </h3>
         </div>
         <ModalGameOver :fightResult="fightResult" :character="store.character" />
     </section>
